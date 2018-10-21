@@ -63,9 +63,10 @@ class _HomePageState extends State<HomePage> {
       ));
     }
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.drawerItems[_selectedDrawerIndex].title),
-      ),
+      // appBar: AppBar(
+      //   title: Text(widget.drawerItems[_selectedDrawerIndex].title),
+      // ),
+      backgroundColor: Colors.grey[200],
       drawer: Drawer(
         child: Column(
           children: <Widget>[
@@ -77,7 +78,9 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      body: _getDrawerItemWidget(_selectedDrawerIndex),
+      body: SafeArea(
+        child: _getDrawerItemWidget(_selectedDrawerIndex),
+      ),
     );
   }
 }
