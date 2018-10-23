@@ -7,6 +7,19 @@ class AbsentLecture extends StatelessWidget {
     @required this.lectureID,
     @required this.studentID,
   });
+
+  void _showInfoDialog(BuildContext context){
+    showDialog(
+      context: context,
+      builder: (BuildContext context){
+        return AlertDialog(
+          title: Text('Missed Lecture'),
+          content: Text('You missed this lecture, click on the lecture box to view images of this lecture or cross icon to remove it'),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
@@ -27,9 +40,14 @@ class AbsentLecture extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                Icon(
-                  Icons.error,
-                  color: Colors.grey[300],
+                GestureDetector(
+                  onTap: (){
+                    _showInfoDialog(context);
+                  },
+                  child: Icon(
+                    Icons.error,
+                    color: Colors.grey[300],
+                  ),
                 ),
                 Center(
                   child: Text(
