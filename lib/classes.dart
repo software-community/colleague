@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import './absentlecture.dart';
-
+import './attendancechart.dart';
 class Classes extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -10,7 +10,9 @@ class Classes extends StatefulWidget {
   }
 }
 
+// state for the classes statefulwidget
 class _ClassesState extends State<Classes> {
+  // function that returns the widget containing the list of lectures in which the person was absent
   List<Widget> _getAbsentList() {
     var absentclasses = <AbsentLecture>[];
     for (var i = 0; i < 3; i++) {
@@ -25,10 +27,9 @@ class _ClassesState extends State<Classes> {
     return absenttoshow;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    // widget for the top card which shows the progress bar and the Alerts
-    var classcard = Padding(
+  // function which returns a widget of the complete card of the attendance progress and absent lectures list
+  Widget _getProgressCard(BuildContext context) {
+    return Padding(
       padding: EdgeInsets.all(10.0),
       child: Card(
         elevation: 2.0,
@@ -60,6 +61,21 @@ class _ClassesState extends State<Classes> {
         ]),
       ),
     );
-    return classcard;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // widget for the top card which shows the progress bar and the Alerts
+    return Container(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          _getProgressCard(context),
+          //AttendanceChart(1),
+          
+        ],
+      ),
+    );
   }
 }
