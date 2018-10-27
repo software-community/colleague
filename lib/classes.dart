@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import './absentlecture.dart';
+import './auth.dart';
 import './attendancechart.dart';
 class Classes extends StatefulWidget {
   @override
@@ -12,6 +13,7 @@ class Classes extends StatefulWidget {
 
 // state for the classes statefulwidget
 class _ClassesState extends State<Classes> {
+  Auth auth = Auth();
   // function that returns the widget containing the list of lectures in which the person was absent
   List<Widget> _getAbsentList() {
     var absentclasses = <AbsentLecture>[];
@@ -56,6 +58,19 @@ class _ClassesState extends State<Classes> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: _getAbsentList(),
+            ),
+          ),
+          Container(
+            padding: EdgeInsets.all(8.0),
+            child: FlatButton(
+              child: Text('LOGOUT'),
+              onPressed: (){
+                auth.gLogout().then((result){
+                  if(result){
+                    Navigator.of(context).pushReplacementNamed('/login');
+                  }
+                });
+              },
             ),
           ),
         ]),

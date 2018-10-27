@@ -2,12 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import './auth.dart';
+import './login.dart';
 // import 'package:flutter/services.dart';
 // import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 
 import './homepage.dart';
-
-void main() {
+SharedPreferences myprefs;
+Widget _defaulthome;
+Auth auth = Auth();
+void main() async{
+  _defaulthome = LoginPage();
+  myprefs = await SharedPreferences.getInstance();
+  String token = myprefs.getString('token');
+  print("token i got ${token}");
+  auth = Auth();
+  if (token != "" && token !=null){
+    print("token found!!!!!");
+    print("token i got ${token}");
+    auth.gSignin();
+    _defaulthome = HomePage();
+  }
   runApp(MyApp());
 }
 
@@ -51,53 +66,8 @@ class _MyAppState extends State<MyApp> {
   String token;
   SharedPreferences prefs;
   Widget home;
-  Widget _getlogin(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(username),
-            FlatButton(
-              child: Text('Google-Signin'),
-              onPressed: () {
-                _gSignin();
-              },
-              color: Colors.red[900],
-            ),
-            FlatButton(
-              child: Text('Google-Signout'),
-              onPressed: (){
-                _gLogout();
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
-  _gLogout(){
-    _googleSignin.signOut();
-    prefs.setString("token", "");
-  }
-
-  Future<String> _checklogin() async {
-    print("check login called");
-    prefs = await SharedPreferences.getInstance();
-    token = prefs.getString('token');
-    print(token);
-    if(token == "" || token ==null){
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => _getlogin(context)),
-      );
-    }else{
-    //  print("inside elser");
-      _gSignin();
-    }
-    return null;
-  }
+  
 
   Future<FirebaseUser> _gSignin() async {
     GoogleSignInAccount googleSignInAccount = await _googleSignin.signIn();
@@ -123,7 +93,7 @@ class _MyAppState extends State<MyApp> {
         child: FlatButton(
           child: Text('button'),
           onPressed: (){
-            _gLogout();
+            //_gLogout();
           },
         ),
       ),
@@ -133,14 +103,18 @@ class _MyAppState extends State<MyApp> {
     // calling the functions to change the color of navigation bar and status bar
     //changeStatusColor(Colors.grey[200]);
     //changeNavigationColor(Colors.grey[200]);
-    home = trial();
+    //home = trial();
     //print('build');
     //randomfunc();
-    _checklogin();
+    //_checklogin();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Greatest app',
-      home: home,
+      home: _defaulthome,
+      routes: <String, WidgetBuilder>{
+        '/home' : (BuildContext context) => HomePage(),
+        '/login' : (BuildContext context) => LoginPage(), 
+      },
       // home: HomePage(),
     );
   }
