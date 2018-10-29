@@ -22,12 +22,14 @@ class AbsentLecture extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
     // TODO: implement build
     return Material(
       color: Colors.grey[600],
       borderRadius: BorderRadius.all(Radius.circular(15.0)),
       child: Container(
         height: 30.0,
+        width: width*.52,
         child: InkWell(
           borderRadius: BorderRadius.all(Radius.circular(15.0)),
           highlightColor: Colors.red[900],

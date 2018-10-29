@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import './auth.dart';
 import './login.dart';
@@ -60,45 +58,10 @@ class _MyAppState extends State<MyApp> {
   //   }
   // }
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignin = new GoogleSignIn();
   String username = 'not asigned';
   String token;
   SharedPreferences prefs;
-  Widget home;
 
-  
-
-  Future<FirebaseUser> _gSignin() async {
-    GoogleSignInAccount googleSignInAccount = await _googleSignin.signIn();
-    GoogleSignInAuthentication googleSignInAuthentication =
-        await googleSignInAccount.authentication;
-    FirebaseUser user = await _auth.signInWithGoogle(
-        idToken: googleSignInAuthentication.idToken,
-        accessToken: googleSignInAuthentication.accessToken);
-    prefs.setString('token', await user.getIdToken());
-    print("User is: ${user.displayName}");
-    //setState((){
-    //    home = HomePage();
-    //});
-    return user;
-  }
-  Future<void> randomfunc() async {
-    print('stop calling me');
-  }
-  @override
-  Widget trial(){
-    return Scaffold(
-      body: Center(
-        child: FlatButton(
-          child: Text('button'),
-          onPressed: (){
-            //_gLogout();
-          },
-        ),
-      ),
-    );
-  }
   Widget build(BuildContext context) {
     // calling the functions to change the color of navigation bar and status bar
     //changeStatusColor(Colors.grey[200]);
