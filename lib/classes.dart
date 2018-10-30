@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flip_panel/flip_panel.dart';
+import 'package:flutter_circular_chart/flutter_circular_chart.dart';
 
 import './attendancechart.dart';
 import './absentlecture.dart';
 import './auth.dart';
 
 class Classes extends StatefulWidget {
+  final GlobalKey<AnimatedCircularChartState> _chartKey = new GlobalKey<AnimatedCircularChartState>();
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
@@ -13,15 +15,32 @@ class Classes extends StatefulWidget {
   }
 }
 
+
 // state for the classes statefulwidget
-class _ClassesState extends State<Classes> {
+class _ClassesState extends State<Classes> with TickerProviderStateMixin {
+  AnimationController controller;
+  Animation<double> animation;
+
+  initState() {
+    super.initState();
+    controller = AnimationController(
+        duration: const Duration(milliseconds: 500), vsync: this);
+    animation = CurvedAnimation(parent: controller, curve: Curves.easeIn);
+    controller.forward();
+  }
+  dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
   Auth auth = Auth();
   double width;
   // function that returns the widget containing the list of lectures in which the person was absent
   List<Widget> _getAbsentList() {
+    final widthTween = Tween<double>(begin: 0.0, end: width*.52);
     var absentclasses = <AbsentLecture>[];
     for (var i = 0; i < 3; i++) {
-      absentclasses.add(AbsentLecture(lectureID: 3, studentID: 3));
+      absentclasses.add(AbsentLecture(lectureID: 3, studentID: 3, animation: animation, widthTween: widthTween,));
     }
     var absenttoshow = <Widget>[];
     for (var i = 0; i < absentclasses.length; i++) {
@@ -61,11 +80,7 @@ class _ClassesState extends State<Classes> {
                 child: SizedBox(
                   height: width * .17,
                   width: width * .17,
-                  child: CircularProgressIndicator(
-                    backgroundColor: Colors.blue,
-                    strokeWidth: width * .1,
-                    value: 0.7,
-                  ),
+                  child: circleProgress(),
                 ),
               ),
               Container(
@@ -111,6 +126,39 @@ class _ClassesState extends State<Classes> {
           _buildAction('Class1'),
           _buildAllClasses(),
         ],
+      ),
+    );
+  }
+  Widget circleProgress(){
+    return AnimatedCircularChart(
+      duration: Duration(seconds: 1),
+      holeRadius: 15.0,
+      key: Key('70'),
+      size: Size(150.0, 150.0),
+      initialChartData: <CircularStackEntry>[
+        CircularStackEntry(
+          <CircularSegmentEntry>[
+            CircularSegmentEntry(
+              33.33,
+              Colors.blue[400],
+              rankKey: 'completed',
+            ),
+            CircularSegmentEntry(
+              66.67,
+              Colors.blueGrey[600],
+              rankKey: 'remaining',
+            ),
+          ],
+          rankKey: 'progress',
+        ),
+      ],
+      chartType: CircularChartType.Radial,
+      percentageValues: true,
+      holeLabel: '1/3',
+      labelStyle: TextStyle(
+        color: Colors.blueGrey[600],
+        fontWeight: FontWeight.bold,
+        fontSize: 24.0,
       ),
     );
   }

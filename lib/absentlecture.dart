@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 
-class AbsentLecture extends StatelessWidget {
+class AbsentLecture extends AnimatedWidget {
   final int lectureID;
   final int studentID;
+  static final _opacityTween = Tween<double>(begin: 0.1, end: 1.0);
+  static final heightTween = Tween<double>(begin: 0.0, end: 30.0);
+  final widthTween;
   const AbsentLecture({
+    Key key,
+    Animation<double> animation,
     @required this.lectureID,
     @required this.studentID,
-  });
+    @required this.widthTween,
+  }):  super(key:key, listenable: animation);
 
   void _showInfoDialog(BuildContext context){
     showDialog(
@@ -19,11 +25,8 @@ class AbsentLecture extends StatelessWidget {
       },
     );
   }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _getLectureContainer(BuildContext context, Animation<double> animation){
     double width = MediaQuery.of(context).size.width;
-    // TODO: implement build
     return Material(
       color: Colors.grey[600],
       borderRadius: BorderRadius.all(Radius.circular(15.0)),
@@ -35,7 +38,7 @@ class AbsentLecture extends StatelessWidget {
           highlightColor: Colors.red[900],
           splashColor: Colors.red[900],
           onTap: () {
-            print('i was tapped');
+            // what to do when an absent lecture container is tapped
           },
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 10.0),
@@ -54,13 +57,32 @@ class AbsentLecture extends StatelessWidget {
                 Center(
                   child: Text(
                     'Lecture 1',
+                    
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey[300]),
+                    style: TextStyle(
+                      color: Colors.grey[300],
+                      ),
                   ),
                 ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+  @override
+  Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    // TODO: implement build
+    Animation<double> animation = listenable;
+    return Center(
+      child: Opacity(
+        opacity: _opacityTween.evaluate(animation),
+        child: Container(
+          height: 30.0,
+          width: width*.52,
+          child: _getLectureContainer(context, animation),
         ),
       ),
     );
