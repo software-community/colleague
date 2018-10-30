@@ -32,7 +32,6 @@ class AbsentLecture extends AnimatedWidget {
       borderRadius: BorderRadius.all(Radius.circular(15.0)),
       child: Container(
         height: 30.0,
-        width: width*.52,
         child: InkWell(
           borderRadius: BorderRadius.all(Radius.circular(15.0)),
           highlightColor: Colors.red[900],
