@@ -30,6 +30,7 @@ dependencies:
   shared_preferences: ^0.4.3
   flip_panel: ^0.0.8
   flutter_circular_chart: ^0.1.0
+  backdrop: any
 
 dev_dependencies:
   flutter_test:

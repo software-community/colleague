@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:backdrop/backdrop.dart';
+
 import './auth.dart';
 import './login.dart';
 // import 'package:flutter/services.dart';
 // import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
-
-import './homepage.dart';
+import './student/studenthome.dart';
+import './faculty/facultyhome.dart';
 SharedPreferences myprefs;
 Widget _defaulthome;
 Auth auth = Auth();
@@ -18,8 +20,12 @@ void main() async{
   if (token != "" && token !=null){
     print("token found!!!!!");
     print("token i got ${token}");
-    auth.gSignin();
-    _defaulthome = HomePage();
+    if(token == '1') {
+      _defaulthome = StudentHome();
+    }
+    if(token == '2'){
+      _defaulthome = FacultyHome();
+    }
   }
   runApp(MyApp());
 }
@@ -75,7 +81,8 @@ class _MyAppState extends State<MyApp> {
       title: 'Greatest app',
       home: _defaulthome,
       routes: <String, WidgetBuilder>{
-        '/home' : (BuildContext context) => HomePage(),
+        '/facultyhome' : (BuildContext context) => FacultyHome(),
+        '/studenthome' : (BuildContext context) => StudentHome(),
         '/login' : (BuildContext context) => LoginPage(), 
       },
       // home: HomePage(),

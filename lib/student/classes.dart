@@ -4,17 +4,17 @@ import 'package:flutter_circular_chart/flutter_circular_chart.dart';
 
 import './attendancechart.dart';
 import './absentlecture.dart';
-import './auth.dart';
+import '../auth.dart';
 
 class Classes extends StatefulWidget {
-  final GlobalKey<AnimatedCircularChartState> _chartKey = new GlobalKey<AnimatedCircularChartState>();
+  final GlobalKey<AnimatedCircularChartState> _chartKey =
+      new GlobalKey<AnimatedCircularChartState>();
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
     return _ClassesState();
   }
 }
-
 
 // state for the classes statefulwidget
 class _ClassesState extends State<Classes> with TickerProviderStateMixin {
@@ -28,6 +28,7 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
     animation = CurvedAnimation(parent: controller, curve: Curves.easeIn);
     controller.forward();
   }
+
   dispose() {
     controller.dispose();
     super.dispose();
@@ -37,10 +38,15 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
   double width;
   // function that returns the widget containing the list of lectures in which the person was absent
   List<Widget> _getAbsentList() {
-    final widthTween = Tween<double>(begin: 0.0, end: width*.52);
+    final widthTween = Tween<double>(begin: 0.0, end: width * .52);
     var absentclasses = <AbsentLecture>[];
     for (var i = 0; i < 3; i++) {
-      absentclasses.add(AbsentLecture(lectureID: 3, studentID: 3, animation: animation, widthTween: widthTween,));
+      absentclasses.add(AbsentLecture(
+        lectureID: 3,
+        studentID: 3,
+        animation: animation,
+        widthTween: widthTween,
+      ));
     }
     var absenttoshow = <Widget>[];
     for (var i = 0; i < absentclasses.length; i++) {
@@ -129,7 +135,8 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
       ),
     );
   }
-  Widget circleProgress(){
+
+  Widget circleProgress() {
     return AnimatedCircularChart(
       duration: Duration(seconds: 1),
       holeRadius: 15.0,
@@ -167,41 +174,47 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
     final courses = ['CSL456', 'CSL503', 'PHL201', 'MAL112'];
     final timings = ['11:45 AM', '02:00 PM', '02:55 PM', '03:50 PM'];
     return Card(
-        elevation: 10.0,
-        child: FlipPanel.builder(
-          itemsCount: 1000000000,
-          period: const Duration(milliseconds: 1600),
-          itemBuilder:(context, index) => Container(
-          margin: EdgeInsets.symmetric(horizontal: 0.0),
+      elevation: 10.0,
+      child: FlipPanel.builder(
+        itemsCount: 1000000000,
+        period: const Duration(milliseconds: 1600),
+        itemBuilder: (context, index) => Container(
+              margin: EdgeInsets.symmetric(horizontal: 0.0),
               width: width / 2 - 20,
-              height: 120.0,
+              height: 70.0,
               child: Column(
                 //crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Container(
-                    height: 60.0,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(4.0),
+                        topRight: Radius.circular(4.0),
+                      ),
+                      color: Colors.blue,
+                    ),
+                    height: 35.0,
                     width: width / 2 - 20,
-                    color: Colors.blue,
                     child: Align(
                       alignment: FractionalOffset.bottomCenter,
                       child: Text(
-                        courses[index%4],
+                        courses[index % 4],
                       ),
                     ),
                   ),
                   Container(
-                    height: 58.0,
+                    height: 33.0,
                     width: 150.0,
                     child: Align(
                       alignment: FractionalOffset.topCenter,
                       child: Text(
-                        timings[index%4],
+                        timings[index % 4],
                       ),
                     ),
                   ),
                 ],
               ),
-        ),
+            ),
       ),
     );
   }
@@ -209,52 +222,54 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
   // this function builds and returns a single instance of the class card
   Widget _buildAction(String title) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 6.0),
-      child: Card(
-        elevation: 10.0,
-        child: Column(
-          children: <Widget>[
-            Container(
-              margin: EdgeInsets.symmetric(horizontal: 0.0),
-              width: width / 2 - 20,
-              height: 120.0,
-              child: Column(
-                //crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                    height: 60.0,
-                    width: width / 2 - 20,
+        padding: EdgeInsets.symmetric(horizontal: 6.0),
+        child: Card(
+          elevation: 10.0,
+          child: Container(
+            margin: EdgeInsets.symmetric(horizontal: 0.0),
+            width: width / 2 - 20,
+            height: 70.0,
+            child: Column(
+              //crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(4.0),
+                      topRight: Radius.circular(4.0),
+                    ),
                     color: Colors.blue,
-                    child: Align(
-                      alignment: FractionalOffset.bottomCenter,
-                      child: Text(
-                        'CSL333',
-                      ),
+                  ),
+                  height: 35.0,
+                  width: width / 2 - 20,
+                  child: Align(
+                    alignment: FractionalOffset.bottomCenter,
+                    child: Text(
+                      'CSL333',
                     ),
                   ),
-                  Container(
-                    height: 58.0,
-                    width: 150.0,
-                    child: Align(
-                      alignment: FractionalOffset.topCenter,
-                      child: Text(
-                        '10:45 AM',
-                      ),
+                ),
+                Container(
+                  height: 33.0,
+                  width: 150.0,
+                  child: Align(
+                    alignment: FractionalOffset.topCenter,
+                    child: Text(
+                      '11:45PM',
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 
   @override
   Widget build(BuildContext context) {
     // widget for the top card which shows the progress bar and the Alerts
-    return Container(
+    return Material(
+      shape: BeveledRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(20.0))),
       child: ListView(
         children: <Widget>[
           _getProgressCard(context),

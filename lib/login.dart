@@ -21,8 +21,13 @@ class _LoginPageState extends State<LoginPage> {
                 child: Text('Google-Signin'),
                 onPressed: () {
                   auth.gSignin().then((result){
-                    if(result){
-                      Navigator.of(context).pushReplacementNamed('/home');
+                    if(result > 0){
+                      if(result == 2){
+                        Navigator.of(context).pushReplacementNamed('/facultyhome');
+                      }
+                      if(result == 1){
+                        Navigator.of(context).pushReplacementNamed('/studenthome');
+                      }
                     }
                   });
                 },
