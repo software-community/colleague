@@ -14,10 +14,13 @@ class AttendanceChart extends StatefulWidget {
 
 class _AttendenceState extends State<AttendanceChart> {
   String _value = 'one';
-  var below75;
+  var _below75;
   var _showdata;
   var data = [
     PercentAttendance('2017csb1073', 90),
+    PercentAttendance('2017csb1074', 85),
+    PercentAttendance('2017csb1075', 65),
+    PercentAttendance('2017csb1076', 78),
     PercentAttendance('345', 50),
     PercentAttendance('367', 100),
     PercentAttendance('334', 70),
@@ -32,14 +35,10 @@ class _AttendenceState extends State<AttendanceChart> {
 
   @override
   void initState() {
-    below75 = data.where((i) => i.attendance < 75).toList();
+    _below75 = data.where((i) => i.attendance < 75).toList();
     _showdata=data;
     super.initState();
   }
-
-  
-
-  
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +74,7 @@ class _AttendenceState extends State<AttendanceChart> {
           // Hide domain axis.
           domainAxis: OrdinalAxisSpec(renderSpec: new NoneRenderSpec()),
         ),
-        height: 40.0 * data.length,
+        height: 40.0 * _showdata.length,
       ),
     );
 
@@ -96,7 +95,7 @@ class _AttendenceState extends State<AttendanceChart> {
               setState(() {
                 _value = value;
                 if (value == 'two') {
-                  _showdata = below75;
+                  _showdata = _below75;
                 } else
                   _showdata = data;
               });
