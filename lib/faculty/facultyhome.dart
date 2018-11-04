@@ -5,6 +5,7 @@ import '../about.dart';
 import '../settings.dart';
 import '../auth.dart';
 import './facultyclasses.dart';
+import './facultylecture.dart';
 class DrawerItem {
   String title;
   IconData icon;
@@ -20,7 +21,7 @@ class FacultyHome extends StatefulWidget {
 }
 
 class FacultyHomeState extends State<FacultyHome> with SingleTickerProviderStateMixin {
-  Widget frontlayer = FacultyClasses();
+  Widget frontlayer = FacultyLectures();
   AnimationController controller;
   Auth auth = Auth();
   @override
@@ -48,7 +49,11 @@ class FacultyHomeState extends State<FacultyHome> with SingleTickerProviderState
     return GestureDetector(
       onTap: () {
         setState(() {
-          if(category=='Classes'){
+          if(category=='Lectures'){
+            controller.fling(velocity: 2.0);
+            frontlayer=FacultyLectures();
+          }
+          if(category=='Courses'){
             controller.fling(velocity: 2.0);
             frontlayer=FacultyClasses();
           }
@@ -95,6 +100,7 @@ class FacultyHomeState extends State<FacultyHome> with SingleTickerProviderState
         color: Colors.blue,
         child: ListView(
           children: <Widget>[
+            _buildCategory('Lectures', context),
             _buildCategory('Classes', context),
             _buildCategory('Settings', context),
             _buildCategory('About', context),

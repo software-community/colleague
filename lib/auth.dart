@@ -30,6 +30,7 @@ class Auth{
       prefs.setString('token', '1');
       pass = 1;
     }
+    print("token is : ${await user.getIdToken()}");
     print("User is: ${user.displayName}");
     //setState((){
     //    home = HomePage();
