@@ -4,19 +4,18 @@ import 'attendence_chart.dart';
 import 'floating_bar.dart';
 
 class CourcePage extends StatelessWidget {
-  
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
       appBar: AppBar(
         title: Text('CS201'),
-        leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            tooltip: 'Air it',
-            onPressed: () {},
-            alignment: Alignment.centerLeft),
         actions: <Widget>[
+          IconButton(
+              icon: Icon(Icons.arrow_back),
+              tooltip: 'Air it',
+              onPressed: () {},
+              alignment: Alignment.centerLeft),
           Container(
             child: Text(
               '26 OCT 18',
@@ -32,7 +31,7 @@ class CourcePage extends StatelessWidget {
           ),
         ],
       ),
-      floatingActionButton: FancyFab() ,//----floating button
+      floatingActionButton: FancyFab(), //----floating button
       body: Container(
         child: ListView.builder(
           scrollDirection: Axis.vertical,

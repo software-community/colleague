@@ -14,30 +14,37 @@ class AttendanceChart extends StatefulWidget {
 
 class _AttendenceState extends State<AttendanceChart> {
   String _value = 'one';
+  var below75;
+  var _showdata;
+  var data = [
+    PercentAttendance('2017csb1073', 90),
+    PercentAttendance('345', 50),
+    PercentAttendance('367', 100),
+    PercentAttendance('334', 70),
+    PercentAttendance('354', 80),
+    PercentAttendance('335', 80),
+    PercentAttendance('3348', 80),
+    PercentAttendance('3344', 80),
+    PercentAttendance('3345', 80),
+    PercentAttendance('3346', 80),
+    PercentAttendance('3347', 80),
+  ];
+
   @override
   void initState() {
+    below75 = data.where((i) => i.attendance < 75).toList();
+    _showdata=data;
     super.initState();
   }
+
+  
+
+  
 
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    var data = [
-      PercentAttendance('2017csb1073', 90),
-      PercentAttendance('345', 50),
-      PercentAttendance('367', 100),
-      PercentAttendance('334', 70),
-      PercentAttendance('354', 80),
-      PercentAttendance('335', 80),
-      PercentAttendance('3348', 80),
-      PercentAttendance('3344', 80),
-      PercentAttendance('3345', 80),
-      PercentAttendance('3346', 80),
-      PercentAttendance('3347', 80),
-    ];
-    
-    var below75 = data.where((i) => i.attendance < 75).toList();
-    var _showdata = data;
+
     var series = [
       Series(
         id: 'Attendance',
