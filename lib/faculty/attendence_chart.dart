@@ -8,11 +8,14 @@ class PercentAttendance {
 }
 
 class AttendanceChart extends StatefulWidget {
+ final String _date;
+  AttendanceChart(this._date);
   @override
   _AttendenceState createState() => _AttendenceState();
 }
 
 class _AttendenceState extends State<AttendanceChart> {
+  String _date;
   String _value = 'one';
   var _below75;
   var _showdata;
@@ -35,6 +38,7 @@ class _AttendenceState extends State<AttendanceChart> {
 
   @override
   void initState() {
+    _date=widget._date;
     _below75 = data.where((i) => i.attendance < 75).toList();
     _showdata=data;
     super.initState();

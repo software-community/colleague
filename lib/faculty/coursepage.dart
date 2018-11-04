@@ -3,7 +3,21 @@ import 'package:flutter/material.dart';
 import 'attendence_chart.dart';
 import 'floating_bar.dart';
 
-class CourcePage extends StatelessWidget {
+class CourcePage extends StatefulWidget {
+  @override
+  _CoursePageState createState() => _CoursePageState();
+}
+
+class _CoursePageState extends State<CourcePage> {
+  var _pages = ['26 OCT 18', '27 OCT 18', '28 OCT 18'];
+  String _curdate;
+
+  @override
+  void initState() {
+    _curdate = _pages[0];
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -18,7 +32,7 @@ class CourcePage extends StatelessWidget {
               alignment: Alignment.centerLeft),
           Container(
             child: Text(
-              '26 OCT 18',
+              _curdate,
               style: TextStyle(fontSize: 17.0),
             ),
             alignment: Alignment.center,
@@ -33,27 +47,46 @@ class CourcePage extends StatelessWidget {
       ),
       floatingActionButton: FancyFab(), //----floating button
       body: Container(
-        child: ListView.builder(
-          scrollDirection: Axis.vertical,
-          shrinkWrap: true,
-          itemCount: 2,
-          itemBuilder: (BuildContext context, int index) {
-            if (index == 1)
-              return AttendanceChart();
-            else
-              return Card(
-                elevation: 8.0,
-                margin:
-                    new EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
-                child: Container(
-                  decoration: BoxDecoration(color: Colors.lightBlue[800]),
-                  child: _MakeListTile('Mark/Change Attendence', 0xe150),
-                ),
-              );
-          },
-        ),
-      ),
+          child: PageView.builder(
+        onPageChanged: (int index) {
+          setState(() {
+            _curdate = _pages[index];
+          });
+        },
+        itemCount: _pages.length,
+        itemBuilder: (BuildContext context, int index) {
+          return _Pagecontaint(_pages[index]);
+        },
+      )),
     ));
+  }
+}
+
+class _Pagecontaint extends StatelessWidget {
+  final String _date;
+  _Pagecontaint(this._date);
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return ListView.builder(
+      scrollDirection: Axis.vertical,
+      shrinkWrap: true,
+      itemCount: 2,
+      itemBuilder: (BuildContext context, int index) {
+        if (index == 1)
+          return AttendanceChart(_date);
+        else
+          return Card(
+            elevation: 8.0,
+            margin: new EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+            child: Container(
+              decoration: BoxDecoration(color: Colors.lightBlue[800]),
+              child: _MakeListTile('Mark/Change Attendence', 0xe150),
+            ),
+          );
+      },
+    );
   }
 }
 
