@@ -8,6 +8,8 @@ import './login.dart';
 // import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import './student/studenthome.dart';
 import './faculty/facultyhome.dart';
+import './faculty/coursepage.dart';
+
 SharedPreferences myprefs;
 Widget _defaulthome;
 Auth auth = Auth();
@@ -84,6 +86,7 @@ class _MyAppState extends State<MyApp> {
         '/facultyhome' : (BuildContext context) => FacultyHome(),
         '/studenthome' : (BuildContext context) => StudentHome(),
         '/login' : (BuildContext context) => LoginPage(), 
+        '/course' : (BuildContext context) => CourcePage(), 
       },
       // home: HomePage(),
     );

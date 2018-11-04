@@ -23,7 +23,7 @@ class Auth{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     print('User id is : ${user.email}');
     int pass = 0;
-    if(user.email == 'kumarashish1550@gmail.com'){
+    if(user.email == 'kumarashish1550@gmail.com' || user.email == 'dilipsharma640@gmail.com'){
       prefs.setString('token', '2');
       pass = 2;
     }else{

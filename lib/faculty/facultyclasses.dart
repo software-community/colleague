@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+
 class FacultyClasses extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -9,25 +10,33 @@ class FacultyClasses extends StatefulWidget {
 }
 
 class _FacultyClassesState extends State<FacultyClasses> {
-
-  List<Widget> _getClassesCard(){
+  List<Widget> _getClassesCard() {
     final width = MediaQuery.of(context).size.width;
     List<Widget> allClasses = List<Widget>();
     List classes = ['class1', 'class2', 'class3', 'class4'];
-    for(int i = 0; i < classes.length; i++){
+    for (int i = 0; i < classes.length; i++) {
       allClasses.add(Card(
         margin: EdgeInsets.symmetric(
           horizontal: width * .015,
           vertical: width * .01,
         ),
         elevation: 10.0,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(classes[i]),
-          ],
+        child: InkWell(
+          onTap: () {
+            print("tapped");
+            Navigator.pushNamed(context, '/course');
+          },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.all(10.0),
+                child: Text(classes[i]),
+              )
+            ],
+          ),
         ),
       ));
     }
@@ -38,7 +47,8 @@ class _FacultyClassesState extends State<FacultyClasses> {
   Widget build(BuildContext context) {
     // TODO: implement build
     return Material(
-      shape: BeveledRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(20.0))),
+      shape: BeveledRectangleBorder(
+          borderRadius: BorderRadius.only(topLeft: Radius.circular(20.0))),
       child: ListView(
         children: _getClassesCard(),
       ),
