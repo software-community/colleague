@@ -101,7 +101,7 @@ class FacultyHomeState extends State<FacultyHome> with SingleTickerProviderState
         child: ListView(
           children: <Widget>[
             _buildCategory('Lectures', context),
-            _buildCategory('Classes', context),
+            _buildCategory('Courses', context),
             _buildCategory('Settings', context),
             _buildCategory('About', context),
             _buildCategory('Logout', context),
