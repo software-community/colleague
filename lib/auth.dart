@@ -1,7 +1,7 @@
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:http/http.dart' as http;
 class Auth{
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignin = new GoogleSignIn();
@@ -30,8 +30,24 @@ class Auth{
       prefs.setString('token', '1');
       pass = 1;
     }
-    print("token is : ${await user.getIdToken()}");
+    String token = googleSignInAuthentication.idToken;
+    print('this is the correct token');
+    print(token);
+    //String token = await user.getIdToken();
+    //print("token is : ${token}");
     print("User is: ${user.displayName}");
+    var url = "https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=";
+    var client = http.Client();
+    var request = http.Request('POST', Uri.parse(url));
+    var body = {'id_token':token};
+    request.bodyFields = body;
+    var future = client.send(request).then((response){
+      response.stream.bytesToString().then((value){
+        print(value.toString());
+      }).catchError((error){
+        print(error.toString());
+      });
+    });
     //setState((){
     //    home = HomePage();
     //});
