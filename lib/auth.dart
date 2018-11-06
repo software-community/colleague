@@ -30,13 +30,20 @@ class Auth{
       prefs.setString('token', '1');
       pass = 1;
     }
-    String token = googleSignInAuthentication.idToken;
+    String token = await user.getIdToken();
     print('this is the correct token');
     print(token);
     //String token = await user.getIdToken();
     //print("token is : ${token}");
     print("User is: ${user.displayName}");
-    var url = "https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=";
+    verifyToken(token);
+    //setState((){
+    //    home = HomePage();
+    //});
+    return pass;
+  }
+  void verifyToken(String token){
+    var url = "https://calm-brushlands-46408.herokuapp.com/test/";
     var client = http.Client();
     var request = http.Request('POST', Uri.parse(url));
     var body = {'id_token':token};
@@ -48,9 +55,5 @@ class Auth{
         print(error.toString());
       });
     });
-    //setState((){
-    //    home = HomePage();
-    //});
-    return pass;
   }
 }
