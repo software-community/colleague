@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'attendence_chart.dart';
 import 'floating_bar.dart';
+import './mark_attendence.dart';
 
 class CourcePage extends StatefulWidget {
   @override
@@ -20,45 +21,44 @@ class _CoursePageState extends State<CourcePage> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        home: Scaffold(
-      appBar: AppBar(
-        title: Text('CS201'),
-        actions: <Widget>[
-          IconButton(
-              icon: Icon(Icons.arrow_back),
-              tooltip: 'Air it',
-              onPressed: () {},
-              alignment: Alignment.centerLeft),
-          Container(
-            child: Text(
-              _curdate,
-              style: TextStyle(fontSize: 17.0),
-            ),
-            alignment: Alignment.center,
+    return Scaffold(
+          appBar: AppBar(
+            title: Text('CS201'),
+            actions: <Widget>[
+              IconButton(
+                  icon: Icon(Icons.arrow_back),
+                  tooltip: 'Air it',
+                  onPressed: () {},
+                  alignment: Alignment.centerLeft),
+              Container(
+                child: Text(
+                  _curdate,
+                  style: TextStyle(fontSize: 17.0),
+                ),
+                alignment: Alignment.center,
+              ),
+              IconButton(
+                icon: Icon(Icons.arrow_forward),
+                tooltip: 'Air it',
+                onPressed: () {},
+                alignment: Alignment.centerRight,
+              ),
+            ],
           ),
-          IconButton(
-            icon: Icon(Icons.arrow_forward),
-            tooltip: 'Air it',
-            onPressed: () {},
-            alignment: Alignment.centerRight,
-          ),
-        ],
-      ),
-      floatingActionButton: FancyFab(), //----floating button
-      body: Container(
-          child: PageView.builder(
-        onPageChanged: (int index) {
-          setState(() {
-            _curdate = _pages[index];
-          });
-        },
-        itemCount: _pages.length,
-        itemBuilder: (BuildContext context, int index) {
-          return _Pagecontaint(_pages[index]);
-        },
-      )),
-    ));
+          //floatingActionButton: FancyFab(), //----floating button
+          body: Container(
+              child: PageView.builder(
+            onPageChanged: (int index) {
+              setState(() {
+                _curdate = _pages[index];
+              });
+            },
+            itemCount: _pages.length,
+            itemBuilder: (BuildContext context, int index) {
+              return _Pagecontaint(_pages[index]);
+            },
+          )),
+        );
   }
 }
 
@@ -107,10 +107,15 @@ class _MakeListTile extends StatelessWidget {
           child: Icon(IconData(icon, fontFamily: 'MaterialIcons'),
               color: Colors.white),
         ),
-        title: Text(
-          text,
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
+        title: InkWell(
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => MarkAttendence()),);
+            },
+            child: Text(
+              text,
+              style:
+                  TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            )),
         trailing:
             Icon(Icons.keyboard_arrow_right, color: Colors.white, size: 40.0));
   }
