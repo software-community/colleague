@@ -84,8 +84,9 @@ class _FancyFabState extends State<FancyFab>
       Container(
         margin: EdgeInsets.only(left: 10.0),
         child: FloatingActionButton(
+          heroTag: "Add1",
           onPressed: null,
-          tooltip: 'Add',
+          tooltip: 'Add1',
           child: Icon(Icons.add),
         ),
       )
@@ -108,8 +109,9 @@ class _FancyFabState extends State<FancyFab>
       Container(
         margin: EdgeInsets.only(left: 10.0),
         child: FloatingActionButton(
+          heroTag: "Add2",
           onPressed: null,
-          tooltip: 'Add',
+          tooltip: 'Add2',
           child: Icon(Icons.add),
         ),
       )
@@ -132,8 +134,9 @@ class _FancyFabState extends State<FancyFab>
       Container(
         margin: EdgeInsets.only(left: 10.0),
         child: FloatingActionButton(
+          heroTag: "Add3",
           onPressed: null,
-          tooltip: 'Add',
+          tooltip: 'Add3',
           child: Icon(Icons.add),
         ),
       )
@@ -143,6 +146,7 @@ class _FancyFabState extends State<FancyFab>
   Widget toggle() {
     return Row(mainAxisAlignment: MainAxisAlignment.end, children: [
       FloatingActionButton(
+        heroTag: "tog",
         backgroundColor: _buttonColor.value,
         onPressed: animate,
         tooltip: 'Toggle',

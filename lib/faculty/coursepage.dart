@@ -45,7 +45,7 @@ class _CoursePageState extends State<CourcePage> {
               ),
             ],
           ),
-          //floatingActionButton: FancyFab(), //----floating button
+          floatingActionButton: FancyFab(), //----floating button
           body: Container(
               child: PageView.builder(
             onPageChanged: (int index) {
