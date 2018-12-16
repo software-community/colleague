@@ -9,11 +9,14 @@ import './login.dart';
 import './student/studenthome.dart';
 import './faculty/facultyhome.dart';
 import './faculty/coursepage.dart';
+import 'camera.dart';
+import 'package:camera/camera.dart';
 
 SharedPreferences myprefs;
 Widget _defaulthome;
 Auth auth = Auth();
 void main() async{
+  List<CameraDescription> cameras = await availableCameras();
   _defaulthome = LoginPage();
   myprefs = await SharedPreferences.getInstance();
   String token = myprefs.getString('token');
@@ -29,10 +32,12 @@ void main() async{
       _defaulthome = FacultyHome();
     }
   }
-  runApp(MyApp());
+  runApp(MyApp(cameras));
 }
 
 class MyApp extends StatefulWidget {
+  List<CameraDescription> cameras;
+  MyApp(this.cameras);
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
@@ -87,6 +92,7 @@ class _MyAppState extends State<MyApp> {
         '/studenthome' : (BuildContext context) => StudentHome(),
         '/login' : (BuildContext context) => LoginPage(), 
         '/course' : (BuildContext context) => CourcePage(), 
+        '/camera' : (BuildContext context) => Camera(widget.cameras),
       },
       // home: HomePage(),
     );

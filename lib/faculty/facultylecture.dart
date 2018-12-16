@@ -73,8 +73,18 @@ class _FacultyLecturesState extends State<FacultyLectures> {
     return Material(
       shape: BeveledRectangleBorder(
           borderRadius: BorderRadius.only(topLeft: Radius.circular(20.0))),
-      child: ListView(
-        children: _getLecturesCard(),
+      child: Scaffold(
+        body: ListView(
+          children: _getLecturesCard(),
+        ),
+        floatingActionButton: FloatingActionButton.extended(
+          icon: Icon(Icons.camera),
+          label: Text('Snap'),
+          elevation: 20.0,
+          onPressed: (){
+            Navigator.pushNamed(context, '/camera');
+          }
+        ),
       ),
     );
   }

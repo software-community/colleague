@@ -23,7 +23,10 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
   charts_flutter: ^0.4.0
+  http:
+  camera:
   firebase_auth: ^0.6.2+1
+  path_provider:
   firebase_core: any
   firebase_database: ^1.0.5
   google_sign_in: ^3.2.2
