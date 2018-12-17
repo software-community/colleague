@@ -4,6 +4,10 @@ import 'dart:io';
 import 'dart:async';
 import 'package:quiver/time.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart';
+import 'package:async/async.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class Camera extends StatefulWidget {
   List<CameraDescription> cameras;
@@ -23,7 +27,7 @@ class _CameraState extends State<Camera> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    controller = CameraController(widget.cameras[0], ResolutionPreset.medium);
+    controller = CameraController(widget.cameras[0], ResolutionPreset.high);
     controller.initialize().then((_) {
       if (!mounted) {
         return;
@@ -43,9 +47,6 @@ class _CameraState extends State<Camera> {
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      appBar: AppBar(
-        title: const Text('Camera example'),
-      ),
       body: Column(
         children: <Widget>[
           Expanded(
@@ -59,24 +60,12 @@ class _CameraState extends State<Camera> {
               decoration: BoxDecoration(
                 color: Colors.black,
                 border: Border.all(
-                  color: controller != null && controller.value.isRecordingVideo
-                      ? Colors.redAccent
-                      : Colors.grey,
                   width: 3.0,
                 ),
               ),
             ),
           ),
           _captureControlRowWidget(),
-          Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                _thumbnailWidget(),
-              ],
-            ),
-          ),
         ],
       ),
     );
@@ -133,6 +122,7 @@ class _CameraState extends State<Camera> {
         setState(() {
           imagePath = filePath;
         });
+        upload(File(filePath));
         if (filePath != null) showInSnackBar('Picture saved to $filePath');
       }
     });
@@ -166,5 +156,32 @@ class _CameraState extends State<Camera> {
         child: CameraPreview(controller),
       );
     }
+  }
+
+  Future getUploadImg(File _image) async {
+    String apiUrl = 'http://192.168.43.203:8000/lectures/api/lecture-image/';
+    final length = await _image.length();
+    final request = new http.MultipartRequest('GET', Uri.parse(apiUrl))
+      ..files.add(new http.MultipartFile('image', _image.openRead(), length));
+    http.Response response = await http.Response.fromStream(await request.send());
+    print("Result: ${response.body}");
+    //return JSON.decode(response.body);
+  }
+
+  upload(File imageFile) async{
+    var stream = http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
+    var length = await imageFile.length();
+    var uri = Uri.parse("http://192.168.43.203:8000/lectures/api/lecture-image/");
+    var request = new http.MultipartRequest("POST", uri);
+    var multipartFile = new http.MultipartFile('image', stream, length,
+          filename: basename(imageFile.path));
+    request.files.add(multipartFile);
+    var response = await request.send();
+    print('resposnesent');
+    //print(response.statusCode);
+    response.stream.transform(utf8.decoder).listen((value) {
+      print(value);
+    });
+
   }
 }
