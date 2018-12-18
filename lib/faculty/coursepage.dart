@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'floating_bar.dart';
+import 'page2.dart';
 
 class CourcePage extends StatefulWidget {
   @override
@@ -10,6 +11,7 @@ class CourcePage extends StatefulWidget {
 
 class _CoursePageState extends State<CourcePage> {
   var _formatter = new DateFormat('dd-MMM-yy');
+  var _courseName="CS201";
   List _students = [
     ['2017csb1073', true],
     ['2017csb1073', true],
@@ -80,7 +82,7 @@ class _CoursePageState extends State<CourcePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text('CS201')),
+        appBar: AppBar(title: Text(_courseName)),
         floatingActionButton: FancyFab(), //----floating button
         body: Container(
             child: Column(
@@ -106,9 +108,24 @@ class _CoursePageState extends State<CourcePage> {
                         context,
                         MaterialPageRoute(
                             fullscreenDialog: true,
-                            builder: (BuildContext context) => ShowImage(selectedDate)));
+                            builder: (BuildContext context) =>
+                                ShowImage(selectedDate)));
                   },
                   child: new Text("See Images"),
+                ),
+                RaisedButton(
+                  padding: const EdgeInsets.all(8.0),
+                  textColor: Colors.white,
+                  color: Colors.blue,
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            fullscreenDialog: true,
+                            builder: (BuildContext context) =>
+                                Page2(selectedDate,_courseName)));
+                  },
+                  child: new Icon(Icons.insert_chart),
                 )
               ],
             ),
@@ -131,14 +148,15 @@ class ShowImage extends StatelessWidget {
           children: <Widget>[
             Align(
                 alignment: Alignment.topRight,
-                child: Row( 
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children:[ 
-                  Text("Pics of "+_formatter.format(date)),
-                  OutlineButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Icon(Icons.close),
-                )])),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("Pics of " + _formatter.format(date)),
+                      OutlineButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: Icon(Icons.close),
+                      )
+                    ])),
             Hero(
               tag: "hero1",
               child: Container(
