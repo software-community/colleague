@@ -7,8 +7,12 @@ import 'dart:convert';
 
 class PercentAttendance {
   String coursename;
-  int attendance;
+  double attendance;
   PercentAttendance(this.coursename, this.attendance);
+  void setdata(String newname, double newattendance){
+    this.coursename = newname;
+    this.attendance = newattendance;
+  }
 }
 
 class AttendanceChart extends StatefulWidget {
@@ -20,7 +24,12 @@ class AttendanceChart extends StatefulWidget {
 }
 
 class AttendanceChartState extends State<AttendanceChart> {
-  var amount = 60;
+  double amount = 60;
+  List<PercentAttendance> data = List();
+  var chartWidget;
+  var chart;
+  var series;
+  var toreturn;
   @override
   void initState() {
     // TODO: implement initState
@@ -32,18 +41,11 @@ class AttendanceChartState extends State<AttendanceChart> {
   Widget build(BuildContext context) {
     // api call to get the attendance in each course
     // TODO: implement build
-    var data;
-    var series;
-    var chart;
-    var chartWidget;
-    data = [
-      PercentAttendance('333', amount),
-      PercentAttendance('345', 50),
-      PercentAttendance('367', 100),
-      PercentAttendance('334', 80),
-      PercentAttendance('337', 70),
-      PercentAttendance('327', 20),
-    ];
+    data.add(PercentAttendance('', 0));
+    data.add(PercentAttendance('', 0));
+    data.add(PercentAttendance('', 0));
+    data.add(PercentAttendance('', 0));
+    data.add(PercentAttendance('', 0));
     series = [
       Series(
         id: 'Attendance',
@@ -70,11 +72,12 @@ class AttendanceChartState extends State<AttendanceChart> {
         child: chart,
       ),
     );
-    return Card(
+    toreturn = Card(
       margin: EdgeInsets.all(10.0),
       elevation: 10.0,
       child: chartWidget,
     );
+    return toreturn;
   }
 
   Future<Null> getdatafromserver() async {
@@ -91,8 +94,42 @@ class AttendanceChartState extends State<AttendanceChart> {
     print("jsondata of student");
     print(jsondata["student"]);
     setState(() {
-      amount = jsondata["student"];
+      int numcourses = jsondata["courses"].length;
+      for(int i=0; i<numcourses; i++){
+        data[i] = PercentAttendance(jsondata["courses"][i]["id"].toString(), jsondata["courses"][i]["attendace"]*100);
+        print(data);
+      }
+      series = [
+        Series(
+          id: 'Attendance',
+          domainFn: (PercentAttendance attchart, _) => attchart.coursename,
+          measureFn: (PercentAttendance attchart, _) => attchart.attendance,
+          colorFn: (PercentAttendance attchart, _) => Color(
+                r: Colors.grey[700].red,
+                g: Colors.grey[700].green,
+                b: Colors.grey[700].blue,
+                a: Colors.grey[700].alpha,
+              ),
+          data: data,
+        ),
+      ];
+      chart = BarChart(
+        series,
+        animate: true,
+      );
+      chartWidget = Padding(
+        padding: EdgeInsets.all(25.0),
+        child: SizedBox(
+          height: 200.0,
+          child: chart,
+        ),
+      );
     });
+    toreturn = Card(
+      margin: EdgeInsets.all(10.0),
+      elevation: 10.0,
+      child: chartWidget,
+    );
 
     print('this is the outer string');
     print(outerstring);

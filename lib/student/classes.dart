@@ -20,7 +20,7 @@ class Classes extends StatefulWidget {
 class _ClassesState extends State<Classes> with TickerProviderStateMixin {
   AnimationController controller;
   Animation<double> animation;
-
+  var attendance;
   initState() {
     super.initState();
     controller = AnimationController(
@@ -268,13 +268,16 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     // widget for the top card which shows the progress bar and the Alerts
+    setState((){
+      attendance = AttendanceChart();
+    });
     return Material(
       shape: BeveledRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(20.0))),
       child: ListView(
         children: <Widget>[
           _getProgressCard(context),
           _getClassesCard(context),
-          AttendanceChart(),
+          attendance,
         ],
       ),
     );
