@@ -41,6 +41,7 @@ class _CoursePageState extends State<CourcePage> {
       setState(() {
         selectedDate = picked;
       });
+    print("this is also meesed up");
   }
 
   _showAtendence() {

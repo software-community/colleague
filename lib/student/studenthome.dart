@@ -5,13 +5,9 @@ import './classes.dart';
 import '../about.dart';
 import '../settings.dart';
 import '../auth.dart';
-class DrawerItem {
-  String title;
-  IconData icon;
-  DrawerItem(this.title, this.icon);
-}
 class StudentHome extends StatefulWidget {
-
+  int clearance;
+  StudentHome(this.clearance);
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
@@ -60,6 +56,9 @@ class StudentHomeState extends State<StudentHome> with SingleTickerProviderState
             controller.fling(velocity: 2.0);
             frontlayer=About();
           }
+          if(category == 'Switch to TA'){
+            Navigator.of(context).pushReplacementNamed('/tahome');
+          }
           if(category=='Logout'){
             auth.gLogout().then((result) {
               if (result) {
@@ -89,17 +88,21 @@ class StudentHomeState extends State<StudentHome> with SingleTickerProviderState
   }
 
   Widget backlayer(){
+    var navigationList = <Widget>[
+      _buildCategory('Classes', context),
+      _buildCategory('Settings', context),
+      _buildCategory('About', context),
+      _buildCategory('Logout', context),
+    ];
+    if(widget.clearance==1){
+      navigationList.add(_buildCategory('Switch to TA', context));
+    }
     return Center(
       child: Container(
         padding: EdgeInsets.only(top: 40.0),
         color: Colors.blue,
         child: ListView(
-          children: <Widget>[
-            _buildCategory('Classes', context),
-            _buildCategory('Settings', context),
-            _buildCategory('About', context),
-            _buildCategory('Logout', context),
-          ],
+          children: navigationList,
         ),
       ),
     );

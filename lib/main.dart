@@ -26,10 +26,10 @@ void main() async{
     print("token found!!!!!");
     print("token i got ${token}");
     if(token == '1') {
-      _defaulthome = StudentHome();
+      _defaulthome = StudentHome(0);
     }
     if(token == '2'){
-      _defaulthome = FacultyHome();
+      _defaulthome = FacultyHome(0);
     }
   }
   runApp(MyApp(cameras));
@@ -88,8 +88,10 @@ class _MyAppState extends State<MyApp> {
       title: 'Greatest app',
       home: _defaulthome,
       routes: <String, WidgetBuilder>{
-        '/facultyhome' : (BuildContext context) => FacultyHome(),
-        '/studenthome' : (BuildContext context) => StudentHome(),
+        '/facultyhome' : (BuildContext context) => FacultyHome(0),
+        '/studenthome' : (BuildContext context) => StudentHome(0),
+        '/tastudenthome' : (BuildContext context) => StudentHome(1),
+        '/tahome' : (BuildContext context) => FacultyHome(1),
         '/login' : (BuildContext context) => LoginPage(), 
         '/course' : (BuildContext context) => CourcePage(), 
         '/camera' : (BuildContext context) => Camera(widget.cameras),

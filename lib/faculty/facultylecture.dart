@@ -13,53 +13,84 @@ class _FacultyLecturesState extends State<FacultyLectures> {
     final width = MediaQuery.of(context).size.width;
     List<Widget> allLectures = List<Widget>();
     List lectures = ['CSL433', 'CSL123', 'CSL432', 'CSL554'];
-    List type = ['P', 'L', 'P', 'L'];
+    List type = ['Lab', 'Lecture', 'Lab', 'Lecture'];
     List numS = ['67', '43', '23', '54'];
     List time = ['10:45 AM', '10:45 AM', '10:45 AM', '10:45 AM'];
     for (int i = 0; i < lectures.length; i++) {
       allLectures.add(Card(
         elevation: 10.0,
-        child: Container(
-          margin: EdgeInsets.all(5.0),
-          height: 60.0,
-          child: Column(
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                    lectures[i],
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20.0,
-                    ),
-                  ),
-                  Text(
-                    type[i],
-                    textAlign: TextAlign.right,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: EdgeInsets.only(top: 3.0),
-                child: Row(
+        child: InkWell(
+          onTap: () {
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text("Cancel Lecture"),
+                    content: Text(
+                        "You have this lecture coming soon, do you want to cancel this lecture?"),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: Text("No"),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      FlatButton(
+                        child: Text("Yes Cancel"),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  );
+                });
+          },
+          child: Container(
+            margin: EdgeInsets.all(5.0),
+            height: 60.0,
+            child: Column(
+              children: <Widget>[
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Text(time[i]),
-                    Align(
-                      alignment: Alignment(-3.0, -4.0),
-                      child: Icon(
-                        Icons.face,
+                    Text(
+                      lectures[i],
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20.0,
                       ),
                     ),
-                    Text(numS[i]),
+                    Text(
+                      type[i],
+                      textAlign: TextAlign.right,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ],
                 ),
-              )
-            ],
+                Padding(
+                  padding: EdgeInsets.only(top: 3.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(time[i]),
+                      Container(
+                        child: Row(children: <Widget>[
+                          Text(numS[i]),
+                          Align(
+                            alignment: Alignment(-3.0, -4.0),
+                            child: Icon(
+                              Icons.face,
+                            ),
+                          ),
+                        ]),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ));
@@ -78,13 +109,12 @@ class _FacultyLecturesState extends State<FacultyLectures> {
           children: _getLecturesCard(),
         ),
         floatingActionButton: FloatingActionButton.extended(
-          icon: Icon(Icons.camera),
-          label: Text('Snap'),
-          elevation: 20.0,
-          onPressed: (){
-            Navigator.pushNamed(context, '/camera');
-          }
-        ),
+            icon: Icon(Icons.camera),
+            label: Text('Snap'),
+            elevation: 20.0,
+            onPressed: () {
+              Navigator.pushNamed(context, '/camera');
+            }),
       ),
     );
   }

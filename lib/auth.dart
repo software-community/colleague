@@ -26,41 +26,39 @@ class Auth{
         accessToken: googleSignInAuthentication.accessToken);
     SharedPreferences prefs = await SharedPreferences.getInstance();
     print('User id is : ${user.email}');
-    int pass = 0;
-    if(user.email == 'kumarashish1550@gmail.com' || user.email == 'dilipsharma640@gmail.com'){
-      prefs.setString('token', '2');
-      pass = 2;
-    }else{
-      prefs.setString('token', '1');
-      pass = 1;
-    }
     String token = await user.getIdToken();
     print('this is the correct token');
     print(token);
     //String token = await user.getIdToken();
     //print("token is : ${token}");
     print("User is: ${user.displayName}");
-    verifyToken(token);
+    // List<int> datalist = await verifyToken(token);
+    var url = "http://192.168.43.203:8000/accounts/token-login/";
+    var client = http.Client();
+    var request = http.Request('GET', Uri.parse(url));
+    request.headers[HttpHeaders.AUTHORIZATION] = token;
+    print("VERIFYING THE TOKEN");
+    var response = await client.send(request);
+    var responsestr = await response.stream.bytesToString();
+    print("printing repsonse stirng");
+    print(responsestr);
+    var decodeddata = jsonDecode(responsestr);
+    List<int> datalist = List();
+    datalist.add(decodeddata["profile_id"]);
+    if(decodeddata["is_student"] == true && decodeddata["is_teacher"] == true){
+      datalist.add(3);
+    }
+    else if(decodeddata["is_student"] == true){
+      print("yes it is true you jackaass");
+      datalist.add(1);
+    }else if(decodeddata["is_teacher"] == true){
+      datalist.add(2);
+    }
     //setState((){
     //    home = HomePage();
     //});
-    return pass;
-  }
-  void verifyToken(String token){
-    // var url = "https://calm-brushlands-46408.herokuapp.com/test/";
-    // var url = "http://172.21.6.23:8000/accounts/token-auth/";
-    var url = "http://172.21.6.23:8000/lectures/api/sal/3/";
-    var client = http.Client();
-    var request = http.Request('GET', Uri.parse(url));
-    // var body = {'id_token':token};
-    // request.bodyFields = body;
-    request.headers[HttpHeaders.AUTHORIZATION] = token;
-    var future = client.send(request).then((response){
-      response.stream.bytesToString().then((value){
-        print(value.toString());
-      }).catchError((error){
-        print(error.toString());
-      });
-    });
+    print("printing what is retuned");
+    print(datalist);
+    return datalist[1];
   }
 }
