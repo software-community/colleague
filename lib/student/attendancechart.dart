@@ -99,37 +99,7 @@ class AttendanceChartState extends State<AttendanceChart> {
         data[i] = PercentAttendance(jsondata["courses"][i]["id"].toString(), jsondata["courses"][i]["attendace"]*100);
         print(data);
       }
-      series = [
-        Series(
-          id: 'Attendance',
-          domainFn: (PercentAttendance attchart, _) => attchart.coursename,
-          measureFn: (PercentAttendance attchart, _) => attchart.attendance,
-          colorFn: (PercentAttendance attchart, _) => Color(
-                r: Colors.grey[700].red,
-                g: Colors.grey[700].green,
-                b: Colors.grey[700].blue,
-                a: Colors.grey[700].alpha,
-              ),
-          data: data,
-        ),
-      ];
-      chart = BarChart(
-        series,
-        animate: true,
-      );
-      chartWidget = Padding(
-        padding: EdgeInsets.all(25.0),
-        child: SizedBox(
-          height: 200.0,
-          child: chart,
-        ),
-      );
     });
-    toreturn = Card(
-      margin: EdgeInsets.all(10.0),
-      elevation: 10.0,
-      child: chartWidget,
-    );
 
     print('this is the outer string');
     print(outerstring);

@@ -35,7 +35,7 @@ class Auth{
     // List<int> datalist = await verifyToken(token);
     var url = "http://192.168.43.203:8000/accounts/token-login/";
     var client = http.Client();
-    var request = http.Request('GET', Uri.parse(url));
+    var request = http.Request('POST', Uri.parse(url));
     request.headers[HttpHeaders.AUTHORIZATION] = token;
     print("VERIFYING THE TOKEN");
     var response = await client.send(request);
