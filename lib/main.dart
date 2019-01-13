@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:backdrop/backdrop.dart';
+import 'package:global_configuration/global_configuration.dart';
 
 import './auth.dart';
 import './login.dart';
@@ -16,6 +17,7 @@ SharedPreferences myprefs;
 Widget _defaulthome;
 Auth auth = Auth();
 void main() async{
+  await GlobalConfiguration().loadFromAsset("global_values");
   List<CameraDescription> cameras = await availableCameras();
   _defaulthome = LoginPage();
   myprefs = await SharedPreferences.getInstance();

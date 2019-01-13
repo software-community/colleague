@@ -84,7 +84,7 @@ class _FacultyClassesState extends State<FacultyClasses> {
   }
   
   Future<String> getdatafromserver() async {
-    var url = "http://192.168.43.203:8000/accounts/api/teacher/?teacher=10";
+    var url = "http://172.21.7.51:8000/accounts/api/teacher/?teacher=10";
     var client = http.Client();
     var request = http.Request('GET', Uri.parse(url));
     var outerstring;

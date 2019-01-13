@@ -1,6 +1,7 @@
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:global_configuration/global_configuration.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
@@ -33,7 +34,7 @@ class Auth{
     //print("token is : ${token}");
     print("User is: ${user.displayName}");
     // List<int> datalist = await verifyToken(token);
-    var url = "http://192.168.43.203:8000/accounts/token-login/";
+    var url = GlobalConfiguration().getString("api_address")+"/accounts/token-login/";
     var client = http.Client();
     var request = http.Request('POST', Uri.parse(url));
     request.headers[HttpHeaders.AUTHORIZATION] = token;

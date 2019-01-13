@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart';
 import 'package:http/http.dart' as http;
+import 'package:global_configuration/global_configuration.dart';
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
@@ -24,7 +25,7 @@ class AttendanceChart extends StatefulWidget {
 }
 
 class AttendanceChartState extends State<AttendanceChart> {
-  double amount = 60;
+  double amount = 60.0;
   List<PercentAttendance> data = List();
   var chartWidget;
   var chart;
@@ -41,11 +42,11 @@ class AttendanceChartState extends State<AttendanceChart> {
   Widget build(BuildContext context) {
     // api call to get the attendance in each course
     // TODO: implement build
-    data.add(PercentAttendance('', 0));
-    data.add(PercentAttendance('', 0));
-    data.add(PercentAttendance('', 0));
-    data.add(PercentAttendance('', 0));
-    data.add(PercentAttendance('', 0));
+    data.add(PercentAttendance('', 0.0));
+    data.add(PercentAttendance('', 0.0));
+    data.add(PercentAttendance('', 0.0));
+    data.add(PercentAttendance('', 0.0));
+    data.add(PercentAttendance('', 0.0));
     series = [
       Series(
         id: 'Attendance',
@@ -81,7 +82,7 @@ class AttendanceChartState extends State<AttendanceChart> {
   }
 
   Future<Null> getdatafromserver() async {
-    var url = "http://192.168.43.203:8000/accounts/api/student/?student=9";
+    var url = GlobalConfiguration().getString("api_address")+"/accounts/api/student/?student=9";
     var client = http.Client();
     var request = http.Request('GET', Uri.parse(url));
     var outerstring;

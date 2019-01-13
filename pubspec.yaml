@@ -34,6 +34,7 @@ dependencies:
   flip_panel: ^0.0.8
   flutter_circular_chart: ^0.1.0
   backdrop: any
+  global_configuration: any
 
 dev_dependencies:
   flutter_test:
@@ -55,6 +56,7 @@ flutter:
   assets:
    - graphics/1.png
    - graphics/2.png
+   - assets/cfg/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.
