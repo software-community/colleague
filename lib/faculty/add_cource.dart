@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:io';
+import 'package:colleague/auth.dart';
 
 class AddCourse extends StatefulWidget {
   @override
@@ -7,6 +10,7 @@ class AddCourse extends StatefulWidget {
 }
 
 class _AddCourse extends State<AddCourse> {
+  final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   var lectures = {
     "monday": [
       {
@@ -29,8 +33,10 @@ class _AddCourse extends State<AddCourse> {
     "friday": [],
   };
   var lts;
+  String _courseCode;
+  String _courseName;
   String selectedDay;
-  List _map_to_list() {
+  List _maptoList() {
     List lts = [];
     void f(day, timings) {
       for (var timing in timings) lts.add([day.toString(), timing]);
@@ -38,6 +44,24 @@ class _AddCourse extends State<AddCourse> {
 
     lectures.forEach(f);
     return lts;
+  }
+
+  Map _listtoMap() {
+    Map datatoSend = {
+      "course_code": _courseCode,
+      "course_name": _courseName,
+      "lectures": {
+        "monday": [],
+        "tuesday": [],
+        "wednesday": [],
+        "thursday": [],
+        "friday": [],
+      }
+    };
+    for (var lec in lts) {
+      datatoSend['lectures'][lec[0]].add(lec[1]);
+    }
+    return datatoSend;
   }
 
   void _showDialog(day) {
@@ -61,36 +85,78 @@ class _AddCourse extends State<AddCourse> {
     );
   }
 
+  _postdata() {
+    _formKey.currentState.save();
+    if (_courseCode != "" && _courseName != "") {
+      Map data = _listtoMap();
+      print("DATA TO SUBMIT");
+      print(data);
+      String _jsonData = jsonEncode(data);
+      apiRequest(Auth.api_address + "/courses/add-courses/", _jsonData);
+    }
+  }
+
+  Future<void> apiRequest(String url, String jsonData) async {
+    HttpClient httpClient = new HttpClient();
+    HttpClientRequest request = await httpClient.postUrl(Uri.parse(url));
+    request.headers.set(HttpHeaders.AUTHORIZATION, 'how to get token ?');
+    request.add(utf8.encode(jsonData));
+    HttpClientResponse response = await request.close();
+    // todo - you should check the response.statusCode
+    String reply = await response.transform(utf8.decoder).join();
+    httpClient.close();
+    print(reply);
+  }
+
   @override
   void initState() {
     // TODO: implement initState
-    lts = _map_to_list();
-    selectedDay = "Monday";
+    lts = _maptoList();
+    _courseCode = "";
+    _courseName = "";
+    selectedDay = "monday";
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text("Add Course")),
+        appBar: AppBar(
+          title: Text("Add Course"),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.done),
+              onPressed: () {
+                _postdata();
+              },
+            )
+          ],
+        ),
         body: Padding(
           padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
           child: ListView(children: [
-            FormCard(
-              children: <Widget>[
-                Text("Course Details"),
-                TextFormField(
-                    keyboardType:
-                        TextInputType.text, // Use email input type for emails.
-                    decoration: new InputDecoration(
-                        hintText: 'CS201', labelText: 'Course Code')),
-                new TextFormField(
-                    keyboardType:
-                        TextInputType.text, // Use email input type for emails.
-                    decoration: new InputDecoration(
-                        hintText: 'Data Structure', labelText: 'Course Name')),
-              ],
-            ),
+            Form(
+                key: _formKey,
+                child: FormCard(
+                  children: <Widget>[
+                    Text("Course Details"),
+                    TextFormField(
+                        keyboardType: TextInputType.text,
+                        onSaved: (String value) {
+                          _courseCode = value;
+                        },
+                        decoration: new InputDecoration(
+                            hintText: 'CS201', labelText: 'Course Code')),
+                    new TextFormField(
+                        keyboardType: TextInputType.text,
+                        onSaved: (String value) {
+                          _courseName = value;
+                        },
+                        decoration: new InputDecoration(
+                            hintText: 'Data Structure',
+                            labelText: 'Course Name')),
+                  ],
+                )),
             FormCard(
               children: <Widget>[
                 Text("Lectures"),
@@ -102,16 +168,16 @@ class _AddCourse extends State<AddCourse> {
                       items: <DropdownMenuItem<String>>[
                         DropdownMenuItem(
                           child: Text('Monday'),
-                          value: 'Monday',
+                          value: 'monday',
                         ),
                         DropdownMenuItem(
-                            child: Text('Tuesday'), value: 'Tuesday'),
+                            child: Text('Tuesday'), value: 'tuesday'),
                         DropdownMenuItem(
-                            child: Text('Wednesday'), value: 'Wednesday'),
+                            child: Text('Wednesday'), value: 'wednesday'),
                         DropdownMenuItem(
-                            child: Text('Thursday'), value: 'Thursday'),
+                            child: Text('Thursday'), value: 'thursday'),
                         DropdownMenuItem(
-                            child: Text('Friday'), value: 'Friday'),
+                            child: Text('Friday'), value: 'friday'),
                       ],
                       onChanged: (String value) {
                         setState(() {
