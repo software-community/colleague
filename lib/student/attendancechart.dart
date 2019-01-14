@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart';
 import 'package:http/http.dart' as http;
-import 'package:global_configuration/global_configuration.dart';
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
+import 'package:colleague/auth.dart';
 
 class PercentAttendance {
   String coursename;
@@ -82,7 +82,7 @@ class AttendanceChartState extends State<AttendanceChart> {
   }
 
   Future<Null> getdatafromserver() async {
-    var url = GlobalConfiguration().getString("api_address")+"/accounts/api/student/?student=9";
+    var url = Auth.api_address+"/accounts/api/student/?student=9";
     var client = http.Client();
     var request = http.Request('GET', Uri.parse(url));
     var outerstring;
