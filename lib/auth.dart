@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'dart:io';
 
 class Auth{
+  static final  api_address = "https://ext123.herokuapp.com";
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignin = new GoogleSignIn();
 
@@ -33,8 +34,9 @@ class Auth{
     //print("token is : ${token}");
     print("User is: ${user.displayName}");
     // List<int> datalist = await verifyToken(token);
-    var url = "http://192.168.43.203:8000/accounts/token-login/";
+    var url = api_address+"/accounts/token-login/";
     var client = http.Client();
+    print(url);
     var request = http.Request('POST', Uri.parse(url));
     request.headers[HttpHeaders.AUTHORIZATION] = token;
     print("VERIFYING THE TOKEN");

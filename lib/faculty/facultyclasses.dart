@@ -4,6 +4,8 @@ import 'dart:async';
 import 'dart:io';
 import '../objects/allobjects.dart';
 import 'dart:convert';
+import 'package:colleague/auth.dart';
+import 'add_cource.dart';
 
 class FacultyClasses extends StatefulWidget {
   @override
@@ -22,8 +24,8 @@ class _FacultyClassesState extends State<FacultyClasses> {
     final width = MediaQuery.of(context).size.width;
     return new FutureBuilder(
       future: getdatafromserver(),
-      builder: (context, snapshot){
-        if(snapshot.hasData){
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
           courses.clear();
           List<Widget> allCourses = List<Widget>();
           var jsondata = jsonDecode(snapshot.data.toString());
@@ -31,10 +33,10 @@ class _FacultyClassesState extends State<FacultyClasses> {
           print(jsondata);
           int numcourses = jsondata["courses"].length;
           print("numcourses found...");
-          for(int i=0; i<numcourses; i++){
+          for (int i = 0; i < numcourses; i++) {
             var entry = jsondata["courses"][i];
-            courses.add(Course(entry["id"], entry["course__code"], entry["course__name"], entry["student_count"]));
-
+            courses.add(Course(entry["id"], entry["course__code"],
+                entry["course__name"], entry["student_count"]));
           }
           for (int i = 0; i < courses.length; i++) {
             allCourses.add(Card(
@@ -65,7 +67,7 @@ class _FacultyClassesState extends State<FacultyClasses> {
           return ListView(
             children: allCourses,
           );
-        }else if(snapshot.hasError){
+        } else if (snapshot.hasError) {
           return Text("${snapshot.error}");
         }
         return new CircularProgressIndicator();
@@ -76,15 +78,26 @@ class _FacultyClassesState extends State<FacultyClasses> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return Material(
-      shape: BeveledRectangleBorder(
-          borderRadius: BorderRadius.only(topLeft: Radius.circular(20.0))),
-      child: _getClassesCardFuture(),
-    );
+    return Scaffold(
+        floatingActionButton: FloatingActionButton(
+            child: Icon(Icons.add),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      fullscreenDialog: true,
+                      builder: (BuildContext context) =>
+                          AddCourse()));
+            }),
+        body: Material(
+          shape: BeveledRectangleBorder(
+              borderRadius: BorderRadius.only(topLeft: Radius.circular(20.0))),
+          child: _getClassesCardFuture(),
+        ));
   }
-  
+
   Future<String> getdatafromserver() async {
-    var url = "http://192.168.43.203:8000/accounts/api/teacher/?teacher=10";
+    var url = Auth.api_address + "/accounts/api/teacher/?teacher=10";
     var client = http.Client();
     var request = http.Request('GET', Uri.parse(url));
     var outerstring;
