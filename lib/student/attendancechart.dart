@@ -43,7 +43,6 @@ class AttendanceChartState extends State<AttendanceChart> {
   Widget build(BuildContext context) {
     // api call to get the attendance in each course
     // TODO: implement build
-<<<<<<< HEAD
     var jsondata = jsonDecode(widget.serverdata);
     jsondata = jsondata[0];
     var allcourses = jsondata["courses"];
@@ -51,13 +50,6 @@ class AttendanceChartState extends State<AttendanceChart> {
       data.add(PercentAttendance(allcourses[i]["code"], allcourses[i]["attendance"]));
     }
 
-=======
-    data.add(PercentAttendance('', 0.0));
-    data.add(PercentAttendance('', 0.0));
-    data.add(PercentAttendance('', 0.0));
-    data.add(PercentAttendance('', 0.0));
-    data.add(PercentAttendance('', 0.0));
->>>>>>> a43bde5d810bd1214b0074c2c2d678eb9ab05042
     series = [
       Series(
         id: 'Attendance',
@@ -91,8 +83,6 @@ class AttendanceChartState extends State<AttendanceChart> {
     );
     return toreturn;
   }
-<<<<<<< HEAD
-=======
 
   Future<Null> getdatafromserver() async {
     var url = Auth.api_address+"/accounts/api/student/?student=9";
@@ -118,5 +108,4 @@ class AttendanceChartState extends State<AttendanceChart> {
     print('this is the outer string');
     print(outerstring);
   }
->>>>>>> a43bde5d810bd1214b0074c2c2d678eb9ab05042
 }

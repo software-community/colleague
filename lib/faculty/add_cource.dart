@@ -46,8 +46,8 @@ class _AddCourse extends State<AddCourse> {
     return lts;
   }
 
-  Map _listtoMap() {
-    Map datatoSend = {
+  Map<String, dynamic> _listtoMap() {
+    Map<String, dynamic> datatoSend = {
       "course_code": _courseCode,
       "course_name": _courseName,
       "lectures": {
@@ -88,24 +88,40 @@ class _AddCourse extends State<AddCourse> {
   _postdata() {
     _formKey.currentState.save();
     if (_courseCode != "" && _courseName != "") {
-      Map data = _listtoMap();
+      print("before datatosubmit");
+      Map<String, dynamic> data = _listtoMap();
       print("DATA TO SUBMIT");
       print(data);
-      String _jsonData = jsonEncode(data);
-      apiRequest(Auth.api_address + "/courses/add-courses/", _jsonData);
+      apiRequest(Auth.api_address + "/courses/add-courses/", data);
     }
   }
 
-  Future<void> apiRequest(String url, String jsonData) async {
+  Future<void> _apiRequest(String url, String jsonData) async {
     HttpClient httpClient = new HttpClient();
     HttpClientRequest request = await httpClient.postUrl(Uri.parse(url));
-    request.headers.set(HttpHeaders.AUTHORIZATION, 'how to get token ?');
+    request.headers.set(HttpHeaders.AUTHORIZATION, Auth.token);
+    request.headers.set('content-type', 'application/json');
+    print("printing jdondata");
+    print(jsonData);
     request.add(utf8.encode(jsonData));
+    print("here2");
     HttpClientResponse response = await request.close();
     // todo - you should check the response.statusCode
     String reply = await response.transform(utf8.decoder).join();
     httpClient.close();
     print(reply);
+  }
+  Future<void> apiRequest(String url, Map<String, dynamic> jsonData) async {
+    print("entered api request");
+    var client = new http.Client();
+    var request = new http.Request('POST', Uri.parse(url));
+    //Map<String, dynamic> body = jsonDecode(jsonData);
+    request.headers[HttpHeaders.AUTHORIZATION] = Auth.token;
+    Map<String, dynamic> dat = {"course":"faltu"};
+    request.body = jsonEncode(jsonData).toString();
+    var future = client.send(request).then((response)
+        => response.stream.bytesToString().then((value)
+            => print(value.toString()))).catchError((error) => print(error.toString()));
   }
 
   @override
