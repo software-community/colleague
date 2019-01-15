@@ -12,10 +12,12 @@ class PercentAttendance {
   void setdata(String newname, double newattendance){
     this.coursename = newname;
     this.attendance = newattendance;
-  }
+  } 
 }
 
 class AttendanceChart extends StatefulWidget {
+  String serverdata;
+  AttendanceChart(this.serverdata);
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
@@ -34,18 +36,19 @@ class AttendanceChartState extends State<AttendanceChart> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    getdatafromserver();
   }
 
   @override
   Widget build(BuildContext context) {
     // api call to get the attendance in each course
     // TODO: implement build
-    data.add(PercentAttendance('', 0));
-    data.add(PercentAttendance('', 0));
-    data.add(PercentAttendance('', 0));
-    data.add(PercentAttendance('', 0));
-    data.add(PercentAttendance('', 0));
+    var jsondata = jsonDecode(widget.serverdata);
+    jsondata = jsondata[0];
+    var allcourses = jsondata["courses"];
+    for (int i = 0; i < allcourses.length; i++){
+      data.add(PercentAttendance(allcourses[i]["code"], allcourses[i]["attendance"]));
+    }
+
     series = [
       Series(
         id: 'Attendance',
@@ -78,30 +81,5 @@ class AttendanceChartState extends State<AttendanceChart> {
       child: chartWidget,
     );
     return toreturn;
-  }
-
-  Future<Null> getdatafromserver() async {
-    var url = "http://192.168.43.203:8000/accounts/api/student/?student=9";
-    var client = http.Client();
-    var request = http.Request('GET', Uri.parse(url));
-    var outerstring;
-    var jsondata;
-    request.headers[HttpHeaders.AUTHORIZATION] = '1';
-    var response = await client.send(request);
-    var responsestring = await response.stream.bytesToString();
-    print("PRINTING RESPONSE STRING");
-    jsondata = jsonDecode(responsestring.substring(1, responsestring.length-1));
-    print("jsondata of student");
-    print(jsondata["student"]);
-    setState(() {
-      int numcourses = jsondata["courses"].length;
-      for(int i=0; i<numcourses; i++){
-        data[i] = PercentAttendance(jsondata["courses"][i]["id"].toString(), jsondata["courses"][i]["attendace"]*100);
-        print(data);
-      }
-    });
-
-    print('this is the outer string');
-    print(outerstring);
   }
 }

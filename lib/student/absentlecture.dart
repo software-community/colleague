@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-
+import '../objects/allobjects.dart';
 class AbsentLecture extends AnimatedWidget {
-  final int lectureID;
-  final int studentID;
   static final _opacityTween = Tween<double>(begin: 0.1, end: 1.0);
   static final heightTween = Tween<double>(begin: 0.0, end: 30.0);
   final widthTween;
+  final Lecture missed;
+
   const AbsentLecture({
     Key key,
     Animation<double> animation,
-    @required this.lectureID,
-    @required this.studentID,
+    @required this.missed,
     @required this.widthTween,
   }):  super(key:key, listenable: animation);
 
@@ -55,8 +54,7 @@ class AbsentLecture extends AnimatedWidget {
                 ),
                 Center(
                   child: Text(
-                    'Lecture 1',
-                    
+                    missed.code,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: Colors.grey[300],

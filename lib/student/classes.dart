@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flip_panel/flip_panel.dart';
 import 'package:flutter_circular_chart/flutter_circular_chart.dart';
-
+import 'package:http/http.dart' as http;
+import 'dart:async';
+import 'dart:io';
+import '../objects/allobjects.dart';
+import 'dart:convert';
 import './attendancechart.dart';
 import './absentlecture.dart';
 import '../auth.dart';
@@ -37,16 +41,26 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
   Auth auth = Auth();
   double width;
   // function that returns the widget containing the list of lectures in which the person was absent
-  List<Widget> _getAbsentList() {
+  Widget _getAbsentList(String data) {
     final widthTween = Tween<double>(begin: 0.0, end: width * .52);
     var absentclasses = <AbsentLecture>[];
-    for (var i = 0; i < 3; i++) {
-      absentclasses.add(AbsentLecture(
-        lectureID: 3,
-        studentID: 3,
+    var jsondata = jsonDecode(data);
+    jsondata = jsondata[0];
+    var lecture_done = jsondata["lecture_done"];
+    int lectureslen = lecture_done.length;
+    int total = lecture_done.length + jsondata["lecture_pending"].length;
+    int attended = lecture_done.length;
+    for (var i = 0; i < lectureslen; i++) {
+      if(lecture_done[i]["present"] == false){
+        attended = attended-1;
+        Lecture missed = Lecture(lecture_done[i]["id"], lecture_done[i]["lecture"], lecture_done[i]["present"], lecture_done[i]["course_id"], lecture_done[i]["code"]);
+        print("this came false");
+        absentclasses.add(AbsentLecture(
+        missed: missed,
         animation: animation,
         widthTween: widthTween,
       ));
+      }
     }
     var absenttoshow = <Widget>[];
     for (var i = 0; i < absentclasses.length; i++) {
@@ -56,11 +70,14 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
         padding: EdgeInsets.all(2.0),
       ));
     }
-    return absenttoshow;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: absenttoshow,
+    );
   }
 
   // function which returns a widget of the complete card of the attendance progress and absent lectures list
-  Widget _getProgressCard(BuildContext context) {
+  Widget _getProgressCard(BuildContext context, String data) {
     width = MediaQuery.of(context).size.width;
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -86,7 +103,7 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
                 child: SizedBox(
                   height: width * .17,
                   width: width * .17,
-                  child: circleProgress(),
+                  child: circleProgress(data),
                 ),
               ),
               Container(
@@ -97,46 +114,41 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
                   left: 10.0,
                   right: 10.0,
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: _getAbsentList(),
-                ),
+                child: _getAbsentList(data),
               ),
-              /*
-              Container(
-                padding: EdgeInsets.all(0.0),
-                child: FlatButton(
-                  child: Text('LOGOUT'),
-                  onPressed: () {
-                    auth.gLogout().then((result) {
-                      if (result) {
-                        Navigator.of(context).pushReplacementNamed('/login');
-                      }
-                    });
-                  },
-                ),
-              ),*/
             ]),
       ),
     );
   }
 
   // this function builds and returns all the class cards
-  Widget _getClassesCard(BuildContext context) {
+  Widget _getClassesCard(BuildContext context, String data) {
     return Container(
       constraints:
           BoxConstraints(maxHeight: MediaQuery.of(context).size.height * .22),
       margin: EdgeInsets.only(top: 4.0),
       child: Row(
         children: <Widget>[
-          _buildAction('Class1'),
-          _buildAllClasses(),
+          _buildAction(data),
+          _buildAllClasses(data),
         ],
       ),
     );
   }
 
-  Widget circleProgress() {
+  Widget circleProgress(String data) {
+     var jsondata = jsonDecode(data);
+    jsondata = jsondata[0];
+    var lecture_done = jsondata["lecture_done"];
+    int lectureslen = lecture_done.length;
+    int total = lecture_done.length + jsondata["lecture_pending"].length;
+    int attended = lecture_done.length;
+    for (var i = 0; i < lectureslen; i++) {
+      if(lecture_done[i]["present"] == false){
+        attended = attended-1;
+      }
+    }
+    String missedLectureString = attended.toString() + "/" + total.toString();
     return AnimatedCircularChart(
       duration: Duration(seconds: 1),
       holeRadius: 15.0,
@@ -161,7 +173,7 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
       ],
       chartType: CircularChartType.Radial,
       percentageValues: true,
-      holeLabel: '1/3',
+      holeLabel: missedLectureString,
       labelStyle: TextStyle(
         color: Colors.blueGrey[600],
         fontWeight: FontWeight.bold,
@@ -170,8 +182,15 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
     );
   }
 
-  Widget _buildAllClasses() {
-    final courses = ['CSL456', 'CSL503', 'PHL201', 'MAL112'];
+// this function returns the instance of card which holds all upcoming classes
+  Widget _buildAllClasses(String data) {
+    var jsondata = jsonDecode(data);
+    jsondata = jsondata[0];
+    var pending_lectures = jsondata["lecture_pending"];
+    final courses = [];
+    for(int i = 0; i < pending_lectures.length; i++){
+      courses.add(pending_lectures[i]["code"]);
+    }
     final timings = ['11:45 AM', '02:00 PM', '02:55 PM', '03:50 PM'];
     return Card(
       elevation: 10.0,
@@ -198,7 +217,7 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
                     child: Align(
                       alignment: FractionalOffset.bottomCenter,
                       child: Text(
-                        courses[index % 4],
+                        courses[index % courses.length],
                       ),
                     ),
                   ),
@@ -208,7 +227,7 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
                     child: Align(
                       alignment: FractionalOffset.topCenter,
                       child: Text(
-                        timings[index % 4],
+                        timings[index % courses.length],
                       ),
                     ),
                   ),
@@ -219,8 +238,8 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
     );
   }
 
-  // this function builds and returns a single instance of the class card
-  Widget _buildAction(String title) {
+  // this function builds and returns a single instance of the class card, it is used for showing the next class
+  Widget _buildAction(String data) {
     return Padding(
         padding: EdgeInsets.symmetric(horizontal: 6.0),
         child: Card(
@@ -268,18 +287,37 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     // widget for the top card which shows the progress bar and the Alerts
-    setState((){
-      attendance = AttendanceChart();
-    });
-    return Material(
-      shape: BeveledRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(20.0))),
-      child: ListView(
-        children: <Widget>[
-          _getProgressCard(context),
-          _getClassesCard(context),
-          attendance,
-        ],
-      ),
+    return new FutureBuilder(
+      future: getdatafromserver(),
+      builder: (context, snapshot){
+        if(snapshot.hasData){
+          return Material(
+            shape: BeveledRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(20.0))),
+            child: ListView(
+              children: <Widget>[
+                _getProgressCard(context,snapshot.data.toString()),
+                _getClassesCard(context, snapshot.data.toString()),
+                AttendanceChart(snapshot.data.toString()),
+              ],
+            ),
+          );
+        }else if(snapshot.hasError){
+          return Text("${snapshot.error}");
+        }
+        return new CircularProgressIndicator();
+      },
     );
+  }
+  Future<String> getdatafromserver() async {
+    var url = "http://192.168.43.203:8000/accounts/api/student/?student=9";
+    var client = http.Client();
+    var request = http.Request('GET', Uri.parse(url));
+    var outerstring;
+    var jsondata;
+    request.headers[HttpHeaders.AUTHORIZATION] = '1';
+    var response = await client.send(request);
+    var responsestring = await response.stream.bytesToString();
+    return responsestring;
+    
   }
 }
