@@ -7,8 +7,7 @@ import 'dart:convert';
 import 'dart:io';
 
 class Auth{
-  static String token;
-  static final api_address = "http://192.168.43.203:8000";
+  static final api_address = "https://ext123.herokuapp.com";
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignin = new GoogleSignIn();
 
@@ -28,7 +27,8 @@ class Auth{
         accessToken: googleSignInAuthentication.accessToken);
     SharedPreferences prefs = await SharedPreferences.getInstance();
     print('User id is : ${user.email}');
-    token = await user.getIdToken();
+    String token = await user.getIdToken();
+    prefs.setString("token", token);
     print('this is the correct token');
     print(token);
     //String token = await user.getIdToken();

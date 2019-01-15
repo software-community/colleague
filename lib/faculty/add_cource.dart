@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:colleague/auth.dart';
@@ -12,27 +13,14 @@ class AddCourse extends StatefulWidget {
 class _AddCourse extends State<AddCourse> {
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   var lectures = {
-    "monday": [
-      {
-        "start_time": "11:00",
-        "end_time": "11:50",
-      },
-      {
-        "start_time": "14:00",
-        "end_time": "14:50",
-      }
-    ],
-    "tuesday": [
-      {
-        "start_time": "10:00",
-        "end_time": "10:50",
-      }
-    ],
+    "monday": [],
+    "tuesday": [],
     "wednesday": [],
     "thursday": [],
     "friday": [],
   };
   var lts;
+  var _pBar;
   String _courseCode;
   String _courseName;
   String selectedDay;
@@ -92,36 +80,29 @@ class _AddCourse extends State<AddCourse> {
       Map<String, dynamic> data = _listtoMap();
       print("DATA TO SUBMIT");
       print(data);
+      setState(() {
+        _pBar = _progressbar();
+      });
       apiRequest(Auth.api_address + "/courses/add-courses/", data);
     }
   }
 
-  Future<void> _apiRequest(String url, String jsonData) async {
-    HttpClient httpClient = new HttpClient();
-    HttpClientRequest request = await httpClient.postUrl(Uri.parse(url));
-    request.headers.set(HttpHeaders.AUTHORIZATION, Auth.token);
-    request.headers.set('content-type', 'application/json');
-    print("printing jdondata");
-    print(jsonData);
-    request.add(utf8.encode(jsonData));
-    print("here2");
-    HttpClientResponse response = await request.close();
-    // todo - you should check the response.statusCode
-    String reply = await response.transform(utf8.decoder).join();
-    httpClient.close();
-    print(reply);
-  }
   Future<void> apiRequest(String url, Map<String, dynamic> jsonData) async {
     print("entered api request");
     var client = new http.Client();
     var request = new http.Request('POST', Uri.parse(url));
     //Map<String, dynamic> body = jsonDecode(jsonData);
-    request.headers[HttpHeaders.AUTHORIZATION] = Auth.token;
-    Map<String, dynamic> dat = {"course":"faltu"};
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token");
+    print(token);
+    request.headers[HttpHeaders.AUTHORIZATION] = token;
     request.body = jsonEncode(jsonData).toString();
-    var future = client.send(request).then((response)
-        => response.stream.bytesToString().then((value)
-            => print(value.toString()))).catchError((error) => print(error.toString()));
+    var future = client
+        .send(request)
+        .then((response) => response.stream
+            .bytesToString()
+            .then((value) => print(value.toString())))
+        .catchError((error) => print(error.toString())).whenComplete((){Navigator.of(context).pop();});
   }
 
   @override
@@ -131,7 +112,22 @@ class _AddCourse extends State<AddCourse> {
     _courseCode = "";
     _courseName = "";
     selectedDay = "monday";
+    _pBar = Stack();
     super.initState();
+  }
+
+  _progressbar() {
+    return new Stack(
+      children: [
+        new Opacity(
+          opacity: 0.3,
+          child: const ModalBarrier(dismissible: false, color: Colors.grey),
+        ),
+        new Center(
+          child: new CircularProgressIndicator(),
+        ),
+      ],
+    );
   }
 
   @override
@@ -148,9 +144,8 @@ class _AddCourse extends State<AddCourse> {
             )
           ],
         ),
-        body: Padding(
-          padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-          child: ListView(children: [
+        body: Stack(children: <Widget>[
+          ListView(children: [
             Form(
                 key: _formKey,
                 child: FormCard(
@@ -249,7 +244,8 @@ class _AddCourse extends State<AddCourse> {
               ],
             )
           ]),
-        ));
+          _pBar,
+        ]));
   }
 }
 
