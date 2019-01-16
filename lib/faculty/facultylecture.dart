@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import '../auth.dart';
+import 'package:http/http.dart' as http;
+import 'dart:async';
+import 'dart:io';
+import 'dart:convert';
+import '../objects/allobjects.dart';
 
 class FacultyLectures extends StatefulWidget {
   @override
@@ -9,93 +15,127 @@ class FacultyLectures extends StatefulWidget {
 }
 
 class _FacultyLecturesState extends State<FacultyLectures> {
-  List<Widget> _getLecturesCard() {
+  List<LectureProff> lectures = List();
+  Widget _getLecturesCard() {
     final width = MediaQuery.of(context).size.width;
     List<Widget> allLectures = List<Widget>();
-    List lectures = ['CSL433', 'CSL123', 'CSL432', 'CSL554'];
     List type = ['Lab', 'Lecture', 'Lab', 'Lecture'];
     List numS = ['67', '43', '23', '54'];
     List time = ['10:45 AM', '10:45 AM', '10:45 AM', '10:45 AM'];
-    for (int i = 0; i < lectures.length; i++) {
-      allLectures.add(Card(
-        elevation: 10.0,
-        child: InkWell(
-          onTap: () {
-            showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: Text("Cancel Lecture"),
-                    content: Text(
-                        "You have this lecture coming soon, do you want to cancel this lecture?"),
-                    actions: <Widget>[
-                      FlatButton(
-                        child: Text("No"),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                      FlatButton(
-                        child: Text("Yes Cancel"),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                    ],
-                  );
-                });
-          },
-          child: Container(
-            margin: EdgeInsets.all(5.0),
-            height: 60.0,
-            child: Column(
-              children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    Text(
-                      lectures[i],
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20.0,
-                      ),
-                    ),
-                    Text(
-                      type[i],
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 3.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return new FutureBuilder(
+      future: _getdatafromserver(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          lectures.clear();
+          var jsondata = jsonDecode(snapshot.data.toString());
+          jsondata = jsondata[0];
+          print(jsondata);
+          int numlectures = jsondata["lecture_pending"].length;
+          for (int i = 0; i < numlectures; i++) {
+            var lect = jsondata["lecture_pending"][i];
+            print("ABOUT TO ADD LECTURE");
+            lectures.add(LectureProff(
+                lect["id"], lect["course"], lect["time"], lect["code"]));
+            print("CREATED LECTURE");
+            allLectures.add(Card(
+              elevation: 10.0,
+              child: InkWell(
+                onTap: () {
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text("Cancel Lecture"),
+                          content: Text(
+                              "You have this lecture coming soon, do you want to cancel this lecture?"),
+                          actions: <Widget>[
+                            FlatButton(
+                              child: Text("No"),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                            FlatButton(
+                              child: Text("Yes Cancel"),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      });
+                },
+                child: Container(
+                  margin: EdgeInsets.all(5.0),
+                  height: 60.0,
+                  child: Column(
                     children: <Widget>[
-                      Text(time[i]),
-                      Container(
-                        child: Row(children: <Widget>[
-                          Text(numS[i]),
-                          Align(
-                            alignment: Alignment(-3.0, -4.0),
-                            child: Icon(
-                              Icons.face,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            lectures[i].code,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20.0,
                             ),
                           ),
-                        ]),
+                          Text(
+                            type[i],
+                            textAlign: TextAlign.right,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 3.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text(lectures[i].time.substring(0, 5)),
+                            Container(
+                              child: Row(children: <Widget>[
+                                Text(numS[i]),
+                                Align(
+                                  alignment: Alignment(-3.0, -4.0),
+                                  child: Icon(
+                                    Icons.face,
+                                  ),
+                                ),
+                              ]),
+                            ),
+                          ],
+                        ),
+                      )
                     ],
                   ),
-                )
-              ],
-            ),
-          ),
-        ),
-      ));
-    }
-    return allLectures;
+                ),
+              ),
+            ));
+          }
+          return ListView(
+            children: allLectures,
+          );
+        } else if (snapshot.hasError) {
+          return Text("${snapshot.error}");
+        }
+        return new CircularProgressIndicator();
+      },
+    );
+  }
+
+  Future<String> _getdatafromserver() async {
+    var url = "http://192.168.43.203:8000/accounts/api/teacher/?teacher=10";
+    var client = http.Client();
+    var request = http.Request('GET', Uri.parse(url));
+    var outerstring;
+    var jsondata;
+    request.headers[HttpHeaders.AUTHORIZATION] = '1';
+    var response = await client.send(request);
+    var responsestring = await response.stream.bytesToString();
+    return responsestring;
   }
 
   @override
@@ -105,9 +145,7 @@ class _FacultyLecturesState extends State<FacultyLectures> {
       shape: BeveledRectangleBorder(
           borderRadius: BorderRadius.only(topLeft: Radius.circular(20.0))),
       child: Scaffold(
-        body: ListView(
-          children: _getLecturesCard(),
-        ),
+        body: _getLecturesCard(),
         floatingActionButton: FloatingActionButton.extended(
             icon: Icon(Icons.camera),
             label: Text('Snap'),

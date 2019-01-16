@@ -14,3 +14,12 @@ class Lecture {
   String code;
   Lecture(this.id, this.lecture, this.present, this.course_id, this.code);
 }
+
+class LectureProff {
+  int id;
+  int course;
+  String time;
+  String code;
+  LectureProff(this.id, this.course, this.time, this.code);
+  
+}
