@@ -4,7 +4,7 @@ import 'package:backdrop/backdrop.dart';
 
 import './auth.dart';
 import './login.dart';
-// import 'package:flutter/services.dart';
+import 'package:flutter/services.dart';
 // import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import './student/studenthome.dart';
 import './faculty/facultyhome.dart';
@@ -16,6 +16,10 @@ SharedPreferences myprefs;
 Widget _defaulthome;
 Auth auth = Auth();
 void main() async{
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
+
   List<CameraDescription> cameras = await availableCameras();
   _defaulthome = LoginPage();
   myprefs = await SharedPreferences.getInstance();

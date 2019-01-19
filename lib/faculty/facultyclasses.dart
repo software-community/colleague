@@ -40,26 +40,56 @@ class _FacultyClassesState extends State<FacultyClasses> {
           }
           for (int i = 0; i < courses.length; i++) {
             allCourses.add(Card(
-              margin: EdgeInsets.symmetric(
-                horizontal: width * .015,
-                vertical: width * .01,
-              ),
               elevation: 10.0,
               child: InkWell(
                 onTap: () {
-                  print("tapped");
                   Navigator.pushNamed(context, '/course');
                 },
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.all(10.0),
-                      child: Text(courses[i].course_code),
-                    )
-                  ],
+                child: Container(
+                  margin: EdgeInsets.all(5.0),
+                  height: 60.0,
+                  child: Column(
+                    children: <Widget>[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            courses[i].course_code,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20.0,
+                            ),
+                          ),
+                          Text(
+                            courses[i].course_name,
+                            textAlign: TextAlign.right,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 3.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Container(
+                              child: Row(children: <Widget>[
+                                Text(courses[i].student_count.toString()),
+                                Align(
+                                  alignment: Alignment(-3.0, -4.0),
+                                  child: Icon(
+                                    Icons.face,
+                                  ),
+                                ),
+                              ]),
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ),
             ));

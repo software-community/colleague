@@ -5,7 +5,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 import '../objects/allobjects.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 class FacultyLectures extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -16,9 +16,9 @@ class FacultyLectures extends StatefulWidget {
 
 class _FacultyLecturesState extends State<FacultyLectures> {
   List<LectureProff> lectures = List();
+  List<Widget> allLectures = List<Widget>();
   Widget _getLecturesCard() {
     final width = MediaQuery.of(context).size.width;
-    List<Widget> allLectures = List<Widget>();
     List type = ['Lab', 'Lecture', 'Lab', 'Lecture'];
     List numS = ['67', '43', '23', '54'];
     List time = ['10:45 AM', '10:45 AM', '10:45 AM', '10:45 AM'];
@@ -58,6 +58,7 @@ class _FacultyLecturesState extends State<FacultyLectures> {
                             FlatButton(
                               child: Text("Yes Cancel"),
                               onPressed: () {
+                                _deleteLecture(lectures[i].id);
                                 Navigator.of(context).pop();
                               },
                             ),
@@ -124,6 +125,22 @@ class _FacultyLecturesState extends State<FacultyLectures> {
         return new CircularProgressIndicator();
       },
     );
+  }
+
+  Future<String> _deleteLecture(int lectureID) async {
+    var url = "http://192.168.43.203:8000/lectures/api/lecture/"+lectureID.toString()+"/";
+    var client = http.Client();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token");
+    var request = http.Request('DELETE', Uri.parse(url));
+    var outerstring;
+    var jsondata;
+    request.headers[HttpHeaders.AUTHORIZATION] = token;
+    var response = await client.send(request);
+    var responsestring = await response.stream.bytesToString();
+    print("DELETE RESPONSE");
+    print(responsestring);
+    
   }
 
   Future<String> _getdatafromserver() async {

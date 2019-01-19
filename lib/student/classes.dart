@@ -51,18 +51,28 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
     int total = lecture_done.length + jsondata["lecture_pending"].length;
     int attended = lecture_done.length;
     for (var i = 0; i < lectureslen; i++) {
-      if(lecture_done[i]["present"] == false){
-        attended = attended-1;
-        Lecture missed = Lecture(lecture_done[i]["id"], lecture_done[i]["lecture"], lecture_done[i]["present"], lecture_done[i]["course_id"], lecture_done[i]["code"]);
+      if (lecture_done[i]["present"] == false) {
+        attended = attended - 1;
+        Lecture missed = Lecture(
+            lecture_done[i]["id"],
+            lecture_done[i]["lecture"],
+            lecture_done[i]["present"],
+            lecture_done[i]["course_id"],
+            lecture_done[i]["code"]);
         print("this came false");
         absentclasses.add(AbsentLecture(
-        missed: missed,
-        animation: animation,
-        widthTween: widthTween,
-      ));
+          missed: missed,
+          animation: animation,
+          widthTween: widthTween,
+        ));
       }
     }
     var absenttoshow = <Widget>[];
+    absenttoshow.add(AbsentLecture(
+      missed: Lecture(2, 111, false, 2, "CSL111"),
+      animation: animation,
+      widthTween: widthTween,
+    ));
     for (var i = 0; i < absentclasses.length; i++) {
       var absenttoAdd = absentclasses[i];
       absenttoshow.add(absenttoAdd);
@@ -137,18 +147,24 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
   }
 
   Widget circleProgress(String data) {
-     var jsondata = jsonDecode(data);
+    var jsondata = jsonDecode(data);
     jsondata = jsondata[0];
     var lecture_done = jsondata["lecture_done"];
     int lectureslen = lecture_done.length;
     int total = lecture_done.length + jsondata["lecture_pending"].length;
     int attended = lecture_done.length;
     for (var i = 0; i < lectureslen; i++) {
-      if(lecture_done[i]["present"] == false){
-        attended = attended-1;
+      if (lecture_done[i]["present"] == false) {
+        attended = attended - 1;
       }
     }
     String missedLectureString = attended.toString() + "/" + total.toString();
+    double percent;
+    if (total != 0) {
+      percent = attended * 100 / total;
+    } else {
+      percent = 0.0;
+    }
     return AnimatedCircularChart(
       duration: Duration(seconds: 1),
       holeRadius: 15.0,
@@ -158,12 +174,12 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
         CircularStackEntry(
           <CircularSegmentEntry>[
             CircularSegmentEntry(
-              33.33,
+              percent,
               Colors.blue[400],
               rankKey: 'completed',
             ),
             CircularSegmentEntry(
-              66.67,
+              100,
               Colors.blueGrey[600],
               rankKey: 'remaining',
             ),
@@ -188,10 +204,17 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
     jsondata = jsondata[0];
     var pending_lectures = jsondata["lecture_pending"];
     final courses = [];
-    for(int i = 0; i < pending_lectures.length; i++){
+    for (int i = 0; i < pending_lectures.length; i++) {
       courses.add(pending_lectures[i]["code"]);
     }
     final timings = ['11:45 AM', '02:00 PM', '02:55 PM', '03:50 PM'];
+    if (courses.length == 0) {
+      timings.clear();
+      timings.add("");
+    }
+    if (courses.length == 0) {
+      courses.add("No Lectures Left");
+    }
     return Card(
       elevation: 10.0,
       child: FlipPanel.builder(
@@ -289,25 +312,29 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
     // widget for the top card which shows the progress bar and the Alerts
     return new FutureBuilder(
       future: getdatafromserver(),
-      builder: (context, snapshot){
-        if(snapshot.hasData){
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          print(snapshot.data.toString());
           return Material(
-            shape: BeveledRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(20.0))),
+            shape: BeveledRectangleBorder(
+                borderRadius:
+                    BorderRadius.only(topLeft: Radius.circular(20.0))),
             child: ListView(
               children: <Widget>[
-                _getProgressCard(context,snapshot.data.toString()),
+                _getProgressCard(context, snapshot.data.toString()),
                 _getClassesCard(context, snapshot.data.toString()),
                 AttendanceChart(snapshot.data.toString()),
               ],
             ),
           );
-        }else if(snapshot.hasError){
+        } else if (snapshot.hasError) {
           return Text("${snapshot.error}");
         }
         return new CircularProgressIndicator();
       },
     );
   }
+
   Future<String> getdatafromserver() async {
     var url = "http://192.168.43.203:8000/accounts/api/student/?student=9";
     var client = http.Client();
@@ -318,6 +345,5 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
     var response = await client.send(request);
     var responsestring = await response.stream.bytesToString();
     return responsestring;
-    
   }
 }

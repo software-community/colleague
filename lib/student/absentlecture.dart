@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../objects/allobjects.dart';
+import 'showimages.dart';
 class AbsentLecture extends AnimatedWidget {
   static final _opacityTween = Tween<double>(begin: 0.1, end: 1.0);
   static final heightTween = Tween<double>(begin: 0.0, end: 30.0);
@@ -37,6 +38,12 @@ class AbsentLecture extends AnimatedWidget {
           splashColor: Colors.red[900],
           onTap: () {
             // what to do when an absent lecture container is tapped
+            Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            fullscreenDialog: true,
+                            builder: (BuildContext context) =>
+                                ShowImages(missed)));
           },
           child: Padding(
             padding: EdgeInsets.symmetric(horizontal: 10.0),
