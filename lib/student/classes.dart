@@ -179,7 +179,7 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
               rankKey: 'completed',
             ),
             CircularSegmentEntry(
-              100,
+              100.0,
               Colors.blueGrey[600],
               rankKey: 'remaining',
             ),
