@@ -421,7 +421,7 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
                   _showAddCourseDialog(context);
                 },
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(16))),
+                    borderRadius: BorderRadius.all(Radius.circular(16.0))),
               ),
               body: ListView(
                 children: <Widget>[

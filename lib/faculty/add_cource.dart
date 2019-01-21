@@ -94,7 +94,7 @@ class _AddCourse extends State<AddCourse> {
     //Map<String, dynamic> body = jsonDecode(jsonData);
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String token = prefs.getString("token");
-    print(token);
+    //print(token);
     request.headers[HttpHeaders.AUTHORIZATION] = token;
     request.body = jsonEncode(jsonData).toString();
     var future = client

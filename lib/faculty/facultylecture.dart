@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../auth.dart';
+import 'package:colleague/auth.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:io';
@@ -128,7 +128,7 @@ class _FacultyLecturesState extends State<FacultyLectures> {
   }
 
   Future<String> _deleteLecture(int lectureID) async {
-    var url = "http://192.168.43.203:8000/lectures/api/lecture/"+lectureID.toString()+"/";
+    var url = Auth.api_address+"/lectures/api/lecture/"+lectureID.toString()+"/";
     var client = http.Client();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String token = prefs.getString("token");

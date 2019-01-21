@@ -97,7 +97,6 @@ class _MyAppState extends State<MyApp> {
         '/tastudenthome' : (BuildContext context) => StudentHome(1),
         '/tahome' : (BuildContext context) => FacultyHome(1),
         '/login' : (BuildContext context) => LoginPage(), 
-        '/course' : (BuildContext context) => CourcePage(), 
         '/camera' : (BuildContext context) => Camera(widget.cameras),
       },
       // home: HomePage(),

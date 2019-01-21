@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:io';
-import '../objects/allobjects.dart';
 import 'dart:convert';
+
+import '../objects/allobjects.dart';
 import 'package:colleague/auth.dart';
 import 'add_cource.dart';
+import 'package:colleague/faculty/coursepage.dart';
 
 class FacultyClasses extends StatefulWidget {
   @override
@@ -43,7 +45,10 @@ class _FacultyClassesState extends State<FacultyClasses> {
               elevation: 10.0,
               child: InkWell(
                 onTap: () {
-                  Navigator.pushNamed(context, '/course');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => CourcePage(courses[i].id)),
+                  );
                 },
                 child: Container(
                   margin: EdgeInsets.all(5.0),
@@ -100,7 +105,7 @@ class _FacultyClassesState extends State<FacultyClasses> {
         } else if (snapshot.hasError) {
           return Text("${snapshot.error}");
         }
-        return new CircularProgressIndicator();
+        return new Center(child:  CircularProgressIndicator());
       },
     );
   }
@@ -116,8 +121,7 @@ class _FacultyClassesState extends State<FacultyClasses> {
                   context,
                   MaterialPageRoute(
                       fullscreenDialog: true,
-                      builder: (BuildContext context) =>
-                          AddCourse()));
+                      builder: (BuildContext context) => AddCourse()));
             }),
         body: Material(
           shape: BeveledRectangleBorder(
@@ -127,7 +131,7 @@ class _FacultyClassesState extends State<FacultyClasses> {
   }
 
   Future<String> getdatafromserver() async {
-    var url = Auth.api_address + "/accounts/api/teacher/?teacher=10";
+    var url = Auth.api_address + "/accounts/api/teacher/?teacher=17";
     var client = http.Client();
     var request = http.Request('GET', Uri.parse(url));
     var outerstring;
