@@ -52,7 +52,6 @@ class Auth{
       datalist.add(3);
     }
     else if(decodeddata["is_student"] == true){
-      print("yes it is true you jackaass");
       datalist.add(1);
     }else if(decodeddata["is_teacher"] == true){
       datalist.add(2);

@@ -102,7 +102,10 @@ class _AddCourse extends State<AddCourse> {
         .then((response) => response.stream
             .bytesToString()
             .then((value) => print(value.toString())))
-        .catchError((error) => print(error.toString())).whenComplete((){Navigator.of(context).pop();});
+        .catchError((error) => print(error.toString()))
+        .whenComplete(() {
+      Navigator.of(context).pop();
+    });
   }
 
   @override
@@ -157,13 +160,19 @@ class _AddCourse extends State<AddCourse> {
                           _courseCode = value;
                         },
                         decoration: new InputDecoration(
-                            hintText: 'CS201', labelText: 'Course Code')),
+                            border: OutlineInputBorder(),
+                            hintText: 'CS201',
+                            labelText: 'Course Code')),
+                    Padding(
+                      padding: EdgeInsets.only(top: 10.0),
+                    ),
                     new TextFormField(
                         keyboardType: TextInputType.text,
                         onSaved: (String value) {
                           _courseName = value;
                         },
                         decoration: new InputDecoration(
+                            border: OutlineInputBorder(),
                             hintText: 'Data Structure',
                             labelText: 'Course Name')),
                   ],

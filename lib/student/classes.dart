@@ -8,8 +8,8 @@ import '../objects/allobjects.dart';
 import 'dart:convert';
 import './attendancechart.dart';
 import './absentlecture.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../auth.dart';
-
 class Classes extends StatefulWidget {
   final GlobalKey<AnimatedCircularChartState> _chartKey =
       new GlobalKey<AnimatedCircularChartState>();
@@ -38,7 +38,6 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  Auth auth = Auth();
   double width;
   // function that returns the widget containing the list of lectures in which the person was absent
   Widget _getAbsentList(String data) {
@@ -307,6 +306,100 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
         ));
   }
 
+  void _showAddCourseDialog(BuildContext context) {
+    final enrollController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Add a Course'),
+          content: Column(mainAxisSize: MainAxisSize.min, children: [
+            Text('Enter the student enrollment code below to join a course'),
+            Padding(padding: EdgeInsets.only(top: 20.0)),
+            TextFormField(
+              controller: enrollController,
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: 'XueVc',
+                  labelText: 'Enrollment Code'),
+            ),
+          ]),
+          actions: <Widget>[
+            FlatButton(
+              child: Text("Cancel"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text("Add Course"),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _addCourseEnroll(enrollController.text);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _addCourseEnroll(String enrollCode) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      child: Dialog(
+        child: Padding(
+          padding: EdgeInsets.all(5.0),
+          child: _getAddCourseResponse(enrollCode),
+        ),
+      ),
+    );
+  }
+
+  Widget _getAddCourseResponse(String enrollCode){
+    return FutureBuilder(
+      future: _makeCourseAddRequest(enrollCode),
+      builder: (context, snapshot){
+        if(snapshot.hasData){
+          var jsondata = jsonDecode(snapshot.data.toString());
+          if(jsondata["status"] == "Success"){
+            return Text("Course Added Successfully");
+          }
+        }else if(snapshot.hasError){
+          return Text("${snapshot.error}");
+        }
+        return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            CircularProgressIndicator(
+              strokeWidth: 7.0,
+            ),
+            Text("  Loading..."),
+          ]);
+      },
+    );
+  }
+
+  Future<String> _makeCourseAddRequest(String enrollCode) async{
+    print("entered api request");
+    String url = Auth.api_address + "/courses/register-course/";
+    var client = new http.Client();
+    var request = new http.Request('POST', Uri.parse(url));
+    //Map<String, dynamic> body = jsonDecode(jsonData);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token");
+    print(token);
+    request.headers[HttpHeaders.AUTHORIZATION] = token;
+    request.body = jsonEncode(jsonData).toString();
+    var future = client
+        .send(request)
+        .then((response) => response.stream
+            .bytesToString()
+            .then((value) => print(value.toString())))
+        .catchError((error) => print(error.toString()))
+        .whenComplete(() {
+      Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     // widget for the top card which shows the progress bar and the Alerts
@@ -319,12 +412,23 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
             shape: BeveledRectangleBorder(
                 borderRadius:
                     BorderRadius.only(topLeft: Radius.circular(20.0))),
-            child: ListView(
-              children: <Widget>[
-                _getProgressCard(context, snapshot.data.toString()),
-                _getClassesCard(context, snapshot.data.toString()),
-                AttendanceChart(snapshot.data.toString()),
-              ],
+            child: Scaffold(
+              floatingActionButton: FloatingActionButton(
+                child: Icon(Icons.add_box),
+                elevation: 20.0,
+                onPressed: () {
+                  _showAddCourseDialog(context);
+                },
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(16))),
+              ),
+              body: ListView(
+                children: <Widget>[
+                  _getProgressCard(context, snapshot.data.toString()),
+                  _getClassesCard(context, snapshot.data.toString()),
+                  AttendanceChart(snapshot.data.toString()),
+                ],
+              ),
             ),
           );
         } else if (snapshot.hasError) {
@@ -336,7 +440,7 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
   }
 
   Future<String> getdatafromserver() async {
-    var url = "http://192.168.43.203:8000/accounts/api/student/?student=9";
+    var url = Auth.api_address+"/accounts/api/student/?student=9";
     var client = http.Client();
     var request = http.Request('GET', Uri.parse(url));
     var outerstring;
