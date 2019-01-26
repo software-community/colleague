@@ -3,30 +3,26 @@ import 'package:flutter/material.dart';
 import 'attendence_chart.dart';
 
 class Page2 extends StatefulWidget {
-  final DateTime date;
-  final String _courseName;
-  Page2(this.date,this._courseName);
+  final String _id;
+  final String _courceName;
+  Page2(this._id,this._courceName);
   @override
   _PageState createState() => _PageState();
 }
 
 class _PageState extends State<Page2> {
-  DateTime _curdate;
-  String _courseName;
 
   @override
   void initState() {
-    _curdate = widget.date;
-    _courseName=widget._courseName;
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text(_courseName)),
+        appBar: AppBar(title: Text(widget._courceName)),
         body: ListView(
-            children: [AttendanceChart(_curdate),
+            children: [AttendanceChart(widget._id),
         ]));
   }
 }

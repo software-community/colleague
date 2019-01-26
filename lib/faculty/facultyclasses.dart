@@ -47,7 +47,7 @@ class _FacultyClassesState extends State<FacultyClasses> {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => CourcePage(courses[i].id)),
+                    MaterialPageRoute(builder: (context) => CourcePage(courses[i].id,courses[i].course_name)),
                   );
                 },
                 child: Container(

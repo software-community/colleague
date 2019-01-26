@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart';
+import 'package:http/http.dart' as http;
+import 'dart:io';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+
+import 'package:colleague/auth.dart';
 
 class PercentAttendance {
   String coursename;
@@ -8,16 +14,14 @@ class PercentAttendance {
 }
 
 class AttendanceChart extends StatefulWidget {
-  final DateTime _date;
-  AttendanceChart(this._date);
+  final String _courseID;
+  AttendanceChart(this._courseID);
   @override
   _AttendenceState createState() => _AttendenceState();
 }
 
 class _AttendenceState extends State<AttendanceChart> {
-  DateTime _date;
   String _value = 'one';
-  var _below75;
   var _showdata;
   var data = [
     PercentAttendance('2017csb1073', 90),
@@ -38,8 +42,6 @@ class _AttendenceState extends State<AttendanceChart> {
 
   @override
   void initState() {
-    _date = widget._date;
-    _below75 = data.where((i) => i.attendance < 75).toList();
     _showdata = data;
     super.initState();
   }
@@ -67,19 +69,39 @@ class _AttendenceState extends State<AttendanceChart> {
       ),
     ];
 
-    var chartWidget = Padding(
-      padding: EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 15.0),
-      child: SizedBox(
-        child: BarChart(
-          series,
-          animate: true,
-          vertical: false,
-          barRendererDecorator: new BarLabelDecorator<String>(),
-          // Hide domain axis.
-          domainAxis: OrdinalAxisSpec(renderSpec: new NoneRenderSpec()),
-        ),
-        height: 40.0 * _showdata.length,
-      ),
+    var chartWidget = FutureBuilder(
+      future: getdatafromserver(widget._courseID),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          data.clear();
+          var jsondata = jsonDecode(snapshot.data.toString());
+          print("attendence data");
+          print(jsondata);
+          iter(user, att) {
+            data.add(PercentAttendance(user, att.round()));
+          }
+
+          jsondata.forEach(iter);
+
+          if(data.length>0)
+            return Padding(
+              padding: EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 15.0),
+              child: SizedBox(
+                child: BarChart(
+                  series,
+                  animate: true,
+                  vertical: false,
+                  barRendererDecorator: new BarLabelDecorator<String>(),
+                  // Hide domain axis.
+                  domainAxis: OrdinalAxisSpec(renderSpec: new NoneRenderSpec()),
+                ),
+                height: 40.0 * _showdata.length,
+              ),
+            );
+          else return new Center(child: Text('no data received'));
+        }
+        return new Center(child: CircularProgressIndicator());
+      },
     );
 
     return Card(
@@ -99,13 +121,27 @@ class _AttendenceState extends State<AttendanceChart> {
               setState(() {
                 _value = value;
                 if (value == 'two') {
-                  _showdata = _below75;
-                } else
-                  _showdata = data;
+                  _showdata = data.where((i) => i.attendance < 75).toList();
+                } else if(value == 'one')
+                  _showdata = data.toList();
               });
             },
           ),
           chartWidget
         ]));
+  }
+
+  Future<String> getdatafromserver(String courseid) async {
+    var url = Auth.api_address +
+        "/courses/get-total-attendance/?course_id=" +
+        courseid;
+    var client = http.Client();
+    var request = http.Request('GET', Uri.parse(url));
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token");
+    request.headers[HttpHeaders.AUTHORIZATION] = token;
+    var response = await client.send(request);
+    var responsestring = await response.stream.bytesToString();
+    return responsestring;
   }
 }

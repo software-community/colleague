@@ -11,14 +11,14 @@ import 'package:colleague/auth.dart';
 
 class CourcePage extends StatefulWidget {
   final int _id;
-  CourcePage(this._id);
+  final String _courseName;
+  CourcePage(this._id,this._courseName);
   @override
   _CoursePageState createState() => _CoursePageState();
 }
 
 class _CoursePageState extends State<CourcePage> {
   var _formatter = new DateFormat('dd-MMM-yy');
-  var _courseName = "CS201";
   var _attendenceWidget;
   List _students = [
     ['2017csb1073', true],
@@ -105,7 +105,7 @@ class _CoursePageState extends State<CourcePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text(_courseName)),
+        appBar: AppBar(title: Text(widget._courseName)),
         floatingActionButton: FancyFab(), //----floating button
         body: Container(
             child: Column(
@@ -130,7 +130,6 @@ class _CoursePageState extends State<CourcePage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            fullscreenDialog: true,
                             builder: (BuildContext context) =>
                                 ShowImage(selectedDate)));
                   },
@@ -146,7 +145,7 @@ class _CoursePageState extends State<CourcePage> {
                         MaterialPageRoute(
                             fullscreenDialog: true,
                             builder: (BuildContext context) =>
-                                Page2(selectedDate, _courseName)));
+                                Page2(widget._id.toString(),widget._courseName)));
                   },
                   child: new Icon(Icons.insert_chart),
                 )
