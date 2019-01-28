@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'dart:async';
 
 import 'floating_bar.dart';
 import 'page2.dart';
@@ -201,7 +202,7 @@ class _CoursePageState extends State<CourcePage>
     var request = http.Request('GET', Uri.parse(url));
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String token = prefs.getString("token");
-    request.headers[HttpHeaders.AUTHORIZATION] = token;
+    request.headers[HttpHeaders.userAgentHeader] = token;
     var response = await client.send(request);
     var responsestring = await response.stream.bytesToString();
     return responsestring;

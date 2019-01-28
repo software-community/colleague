@@ -136,7 +136,7 @@ class _FacultyClassesState extends State<FacultyClasses> {
     var request = http.Request('GET', Uri.parse(url));
     var outerstring;
     var jsondata;
-    request.headers[HttpHeaders.AUTHORIZATION] = '1';
+    request.headers[HttpHeaders.userAgentHeader] = '1';
     var response = await client.send(request);
     var responsestring = await response.stream.bytesToString();
     return responsestring;

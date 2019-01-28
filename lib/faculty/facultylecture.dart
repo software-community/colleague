@@ -133,7 +133,7 @@ class _FacultyLecturesState extends State<FacultyLectures> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String token = prefs.getString("token");
     var request = http.Request('DELETE', Uri.parse(url));
-    request.headers[HttpHeaders.AUTHORIZATION] = token;
+    request.headers[HttpHeaders.userAgentHeader] = token;
     var response = await client.send(request);
     var responsestring = await response.stream.bytesToString();
     print("DELETE RESPONSE");
