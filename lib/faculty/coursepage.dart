@@ -12,22 +12,16 @@ import 'package:colleague/auth.dart';
 class CourcePage extends StatefulWidget {
   final int _id;
   final String _courseName;
-  CourcePage(this._id,this._courseName);
+  CourcePage(this._id, this._courseName);
   @override
   _CoursePageState createState() => _CoursePageState();
 }
 
-class _CoursePageState extends State<CourcePage> {
+class _CoursePageState extends State<CourcePage>
+    with TickerProviderStateMixin {
   var _formatter = new DateFormat('dd-MMM-yy');
   var _attendenceWidget;
-  List _students = [
-    ['2017csb1073', true],
-    ['2017csb1073', true],
-    ['2017csb1074', false],
-    ['2017csb1075', false],
-    ['2017csb1076', true],
-  ];
-
+  TabController _tabController;
   DateTime selectedDate;
 
   Future<Null> _selectDate(BuildContext context) async {
@@ -49,47 +43,85 @@ class _CoursePageState extends State<CourcePage> {
         future: getdatafromserver(widget._id.toString(), date),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            _students.clear();
             var jsondata = jsonDecode(snapshot.data.toString());
 
-            iter(student, present) {
-              if (student != 'time') _students.add([student, present]);
-            }
+            List<List> _students = List();
 
-            if(jsondata.length>0)
-              jsondata[0].forEach(iter);
+            List<Widget> tabs = List();
+            if (jsondata.length > 0) {
+              for (int i = 0; i < jsondata.length; i++) {
+                _students.add(List());
+                iter(student, present) {
+                  if (student != 'time') _students[i].add([student, present]);
+                }
+                jsondata[i].forEach(iter);
+              }
+
+              _tabController =
+                  new TabController(vsync: this, length: jsondata.length);
+              
+              for (int index = 0; index < jsondata.length; index++) {
+                tabs.add(Tab(
+                  child: Text(
+                    jsondata[index]['time'],
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ));
+              }
+            }
 
             if (_students.length > 0) {
-              return ListView.builder(
-                scrollDirection: Axis.vertical,
-                itemCount: _students.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return Card(
-                    child: Padding(
-                        padding: EdgeInsets.all(2.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: <Widget>[
-                            Text(_students[index][0],
-                                style: TextStyle(
-                                    fontSize: 17.0,
-                                    fontWeight: FontWeight.bold)),
-                            Switch(
-                              value: _students[index][1],
-                              onChanged: (bool value) {
-                                setState(() {
-                                  _students[index][1] = !_students[index][1];
-                                });
-                              },
-                            )
-                          ],
-                        )),
-                  );
-                },
+              List<Widget> studentsWidgets = List();
+              for (int i = 0; i < _students.length; i++) {
+                studentsWidgets.add(ListView.builder(
+                  itemCount: _students[i].length,
+                  itemBuilder: (context, index) {
+                    return Card(
+                      child: Padding(
+                          padding: EdgeInsets.all(2.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: <Widget>[
+                              Text(_students[i][index][0],
+                                  style: TextStyle(
+                                      fontSize: 17.0,
+                                      fontWeight: FontWeight.bold)),
+                              Switch(
+                                value: _students[i][index][1],
+                                onChanged: (bool value) {
+                                  setState(() {
+                                    _students[i][index][1] =
+                                        !_students[i][index][1];
+                                  });
+                                },
+                              )
+                            ],
+                          )),
+                    );
+                  },
+                ));
+              }
+              return Column(
+                children: <Widget>[
+                  PreferredSize(
+                      preferredSize: Size.fromHeight(kToolbarHeight),
+                      child: new Container(
+                        height: 50.0,
+                        child: new TabBar(
+                          controller: _tabController,
+                          tabs: tabs,
+                        ),
+                      )),
+                  Expanded(
+                      child: TabBarView(
+                          controller: _tabController,
+                          children: studentsWidgets))
+                ],
               );
-            }
-            else
-              return Center(child: Text('no data received'),);
+            } else
+              return Center(
+                child: Text('no data received'),
+              );
           }
           return new Center(child: CircularProgressIndicator());
         });
@@ -144,14 +176,16 @@ class _CoursePageState extends State<CourcePage> {
                         context,
                         MaterialPageRoute(
                             fullscreenDialog: true,
-                            builder: (BuildContext context) =>
-                                Page2(widget._id.toString(),widget._courseName)));
+                            builder: (BuildContext context) => Page2(
+                                widget._id.toString(), widget._courseName)));
                   },
                   child: new Icon(Icons.insert_chart),
                 )
               ],
             ),
-            Expanded(child: _attendenceWidget)
+            Expanded(
+              child: _attendenceWidget,
+            )
           ],
         )));
   }
