@@ -118,30 +118,6 @@ class _FancyFabState extends State<FancyFab>
     ]);
   }
 
-  Widget inbox() {
-    return Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-      Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20.0),
-          color: isOpened ? Colors.black : Colors.transparent,
-        ),
-        child: Text('Add Student',
-            style: isOpened
-                ? TextStyle(color: Colors.white)
-                : TextStyle(color: Colors.transparent)),
-        padding: EdgeInsets.all(10.0),
-      ),
-      Container(
-        margin: EdgeInsets.only(left: 10.0),
-        child: FloatingActionButton(
-          heroTag: "Add3",
-          onPressed: null,
-          tooltip: 'Add3',
-          child: Icon(Icons.add),
-        ),
-      )
-    ]);
-  }
 
   Widget toggle() {
     return Row(mainAxisAlignment: MainAxisAlignment.end, children: [
@@ -163,7 +139,7 @@ class _FancyFabState extends State<FancyFab>
         Transform(
           transform: Matrix4.translationValues(
             0.0,
-            _translateButton.value * 3.0,
+            _translateButton.value * 2.0,
             0.0,
           ),
           child: addStudent(),
@@ -171,18 +147,10 @@ class _FancyFabState extends State<FancyFab>
         Transform(
           transform: Matrix4.translationValues(
             0.0,
-            _translateButton.value * 2.0,
+            _translateButton.value ,
             0.0,
           ),
           child: addTa(),
-        ),
-        Transform(
-          transform: Matrix4.translationValues(
-            0.0,
-            _translateButton.value,
-            0.0,
-          ),
-          child: inbox(),
         ),
         toggle(),
       ],

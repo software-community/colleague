@@ -122,7 +122,7 @@ class _FacultyLecturesState extends State<FacultyLectures> {
         } else if (snapshot.hasError) {
           return Text("${snapshot.error}");
         }
-        return new CircularProgressIndicator();
+        return Center(child: CircularProgressIndicator());
       },
     );
   }
@@ -133,8 +133,6 @@ class _FacultyLecturesState extends State<FacultyLectures> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String token = prefs.getString("token");
     var request = http.Request('DELETE', Uri.parse(url));
-    var outerstring;
-    var jsondata;
     request.headers[HttpHeaders.AUTHORIZATION] = token;
     var response = await client.send(request);
     var responsestring = await response.stream.bytesToString();
