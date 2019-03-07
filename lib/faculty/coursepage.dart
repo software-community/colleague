@@ -52,12 +52,12 @@ class _CoursePageState extends State<CourcePage>
             if (jsondata.length > 0) {
               for (int i = 0; i < jsondata.length; i++) {
                 _students.add(List());
-                iter(student, present) {
-                  if (student != 'time') _students[i].add([student, present]);
+                iter(student, value) {
+                  if (student != 'time') _students[i].add([student, value[0],value[1]]);
                 }
                 jsondata[i].forEach(iter);
               }
-
+          
               _tabController =
                   new TabController(vsync: this, length: jsondata.length);
               
@@ -93,6 +93,7 @@ class _CoursePageState extends State<CourcePage>
                                   setState(() {
                                     _students[i][index][1] =
                                         !_students[i][index][1];
+                                    set_att(_students[i][index][2],_students[i][index][1]);
                                   });
                                 },
                               )
@@ -206,6 +207,20 @@ class _CoursePageState extends State<CourcePage>
     var response = await client.send(request);
     var responsestring = await response.stream.bytesToString();
     return responsestring;
+  }
+
+  Future set_att(id,present)async{
+    var url = Auth.api_address +
+        "/lectures/api/sal/"+ id.toString()+"/";
+    var client = http.Client();
+    var request = http.Request('PATCH', Uri.parse(url));
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString("token");
+    request.headers[HttpHeaders.userAgentHeader] = token;
+    request.body = jsonEncode("[{ op: replace, path: /present, value: true }]").toString();
+    var response = await client.send(request);
+    var responsestring = await response.stream.bytesToString();
+    print(responsestring);
   }
 }
 
