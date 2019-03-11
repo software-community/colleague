@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'dart:io';
 import 'dart:async';
+import 'auth.dart';
 import 'package:quiver/time.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
@@ -122,7 +123,7 @@ class _CameraState extends State<Camera> {
         setState(() {
           imagePath = filePath;
         });
-        upload(File(filePath));
+        latestUploadFunction(File(filePath));
         if (filePath != null) showInSnackBar('Picture saved to $filePath');
       }
     });
@@ -167,8 +168,26 @@ class _CameraState extends State<Camera> {
     print("Result: ${response.body}");
     //return JSON.decode(response.body);
   }
+  latestUploadFunction(File imageFile){
+    print("SO FAR SO GOOD");
+    String base64image = base64Encode(imageFile.readAsBytesSync());
+    print("CONVERTED TO BASE 64");
+    String filename = imageFile.path.split("/").last;
+    print("FILENAME IS");
+    print(filename);
+    String url = Auth.api_address + "/lectures/api/lecture-image/";
+    http.post(url, body: {
+      "image":base64image,
+      "lecture":"15",
+    }).then((response){
+      print(response.statusCode);
+    }).catchError((error){
+      print(error);
+    });
 
-  upload(File imageFile) async{
+
+  }
+  upload(imageFile) async{
     var stream = http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
     var length = await imageFile.length();
     var uri = Uri.parse("http://192.168.43.203:8000/lectures/api/lecture-image/");

@@ -7,7 +7,7 @@ import 'dart:convert';
 import 'dart:io';
 
 class Auth{
-  static final api_address = "http://10.20.0.152:8000";
+  static final api_address = "http://192.168.43.203:8000";
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignin = new GoogleSignIn();
 

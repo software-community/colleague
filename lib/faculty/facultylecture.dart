@@ -19,9 +19,9 @@ class _FacultyLecturesState extends State<FacultyLectures> {
   List<Widget> allLectures = List<Widget>();
   Widget _getLecturesCard() {
     final width = MediaQuery.of(context).size.width;
-    List type = ['Lab', 'Lecture', 'Lab', 'Lecture'];
-    List numS = ['67', '43', '23', '54'];
-    List time = ['10:45 AM', '10:45 AM', '10:45 AM', '10:45 AM'];
+    List type = ['Lab', 'Lecture', 'Lab', 'Lecture', "Lab", "Lecture"];
+    List numS = ['67', '43', '23', '54', '34', '56'];
+    List time = ['10:45 AM', '10:45 AM', '10:45 AM', '10:45 AM', '10:45 AM', '10:45 AM'];
     return new FutureBuilder(
       future: _getdatafromserver(),
       builder: (context, snapshot) {
