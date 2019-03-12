@@ -18,8 +18,7 @@ class CourcePage extends StatefulWidget {
   _CoursePageState createState() => _CoursePageState();
 }
 
-class _CoursePageState extends State<CourcePage>
-    with TickerProviderStateMixin {
+class _CoursePageState extends State<CourcePage> with TickerProviderStateMixin {
   var _formatter = new DateFormat('dd-MMM-yy');
   var _attendenceWidget;
   TabController _tabController;
@@ -53,14 +52,16 @@ class _CoursePageState extends State<CourcePage>
               for (int i = 0; i < jsondata.length; i++) {
                 _students.add(List());
                 iter(student, value) {
-                  if (student != 'time') _students[i].add([student, value[0],value[1]]);
+                  if (student != 'time')
+                    _students[i].add([student, value[0], value[1]]);
                 }
+
                 jsondata[i].forEach(iter);
               }
-          
+
               _tabController =
                   new TabController(vsync: this, length: jsondata.length);
-              
+
               for (int index = 0; index < jsondata.length; index++) {
                 tabs.add(Tab(
                   child: Text(
@@ -93,7 +94,8 @@ class _CoursePageState extends State<CourcePage>
                                   setState(() {
                                     _students[i][index][1] =
                                         !_students[i][index][1];
-                                    set_att(_students[i][index][2],_students[i][index][1]);
+                                    set_att(_students[i][index][2],
+                                        _students[i][index][1]);
                                   });
                                 },
                               )
@@ -136,10 +138,42 @@ class _CoursePageState extends State<CourcePage>
     super.initState();
   }
 
+  void showMenuSelection(String value) {
+    if (value == "code")
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Code to join"),
+              content: ListView(),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text("Close"),
+                  onPressed: (){
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
+            );
+          });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text(widget._courseName)),
+        appBar: AppBar(
+          title: Text(widget._courseName),
+          actions: <Widget>[
+            PopupMenuButton(
+                onSelected: showMenuSelection,
+                itemBuilder: (BuildContext context) => <PopupMenuItem<String>>[
+                      const PopupMenuItem<String>(
+                        value: 'code',
+                        child: Text('Student/TA Code'),
+                      ),
+                    ])
+          ],
+        ),
         floatingActionButton: FancyFab(), //----floating button
         body: Container(
             child: Column(
@@ -209,15 +243,16 @@ class _CoursePageState extends State<CourcePage>
     return responsestring;
   }
 
-  Future set_att(id,present)async{
-    var url = Auth.api_address +
-        "/lectures/api/sal/"+ id.toString()+"/";
+  Future set_att(id, present) async {
+    var url = Auth.api_address + "/lectures/api/sal/" + id.toString() + "/";
     var client = http.Client();
     var request = http.Request('PATCH', Uri.parse(url));
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String token = prefs.getString("token");
     request.headers[HttpHeaders.userAgentHeader] = token;
-    request.body = jsonEncode("[{ op: replace, path: /present, value: true }]").toString();
+    request.body = jsonEncode([
+      {"op": "replace", "path": "/present", "value": true}
+    ]);
     var response = await client.send(request);
     var responsestring = await response.stream.bytesToString();
     print(responsestring);
