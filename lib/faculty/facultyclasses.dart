@@ -131,7 +131,7 @@ class _FacultyClassesState extends State<FacultyClasses> {
   }
 
   Future<String> getdatafromserver() async {
-    var url = Auth.api_address + "/accounts/api/teacher/?teacher=17";
+    var url = Auth.api_address + "/accounts/api/teacher/?teacher=10";
     var client = http.Client();
     var request = http.Request('GET', Uri.parse(url));
     var outerstring;

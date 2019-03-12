@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:backdrop/backdrop.dart';
-
+import './student/profile.dart';
 import './auth.dart';
 import './login.dart';
 import 'package:flutter/services.dart';
@@ -98,6 +98,7 @@ class _MyAppState extends State<MyApp> {
         '/tahome' : (BuildContext context) => FacultyHome(1),
         '/login' : (BuildContext context) => LoginPage(), 
         '/camera' : (BuildContext context) => Camera(widget.cameras),
+        '/profile' : (BuildContext context) => Profile(),
       },
       // home: HomePage(),
     );

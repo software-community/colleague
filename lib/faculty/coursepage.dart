@@ -240,6 +240,7 @@ class _CoursePageState extends State<CourcePage> with TickerProviderStateMixin {
     request.headers[HttpHeaders.userAgentHeader] = token;
     var response = await client.send(request);
     var responsestring = await response.stream.bytesToString();
+    print(responsestring);
     return responsestring;
   }
 

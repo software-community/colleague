@@ -4,6 +4,7 @@ import 'package:backdrop/backdrop.dart';
 import './classes.dart';
 import '../about.dart';
 import '../settings.dart';
+import 'profile.dart';
 import '../auth.dart';
 class StudentHome extends StatefulWidget {
   int clearance;
@@ -56,6 +57,10 @@ class StudentHomeState extends State<StudentHome> with SingleTickerProviderState
             controller.fling(velocity: 2.0);
             frontlayer=About();
           }
+          if(category == 'Profile'){
+            controller.fling(velocity: 2.0);
+            frontlayer=Profile();
+          }
           if(category == 'Switch to TA'){
             Navigator.of(context).pushReplacementNamed('/tahome');
           }
@@ -93,6 +98,7 @@ class StudentHomeState extends State<StudentHome> with SingleTickerProviderState
       _buildCategory('Settings', context),
       _buildCategory('About', context),
       _buildCategory('Logout', context),
+      _buildCategory('Profile', context)
     ];
     if(widget.clearance==1){
       navigationList.add(_buildCategory('Switch to TA', context));

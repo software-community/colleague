@@ -389,7 +389,7 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
     String token = prefs.getString("token");
     print(token);
     request.headers[HttpHeaders.AUTHORIZATION] = token;
-    request.body = jsonEncode({"course_code":enrollCode}).toString();
+    request.body = jsonEncode({"code":enrollCode}).toString();
     var future = client
         .send(request)
         .then((response) => response.stream
