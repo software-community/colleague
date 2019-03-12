@@ -9,6 +9,7 @@ import 'package:path/path.dart';
 import 'package:async/async.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Camera extends StatefulWidget {
   List<CameraDescription> cameras;
@@ -71,7 +72,8 @@ class _CameraState extends State<Camera> {
       ),
     );
   }
-    Widget _captureControlRowWidget() {
+
+  Widget _captureControlRowWidget() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       mainAxisSize: MainAxisSize.max,
@@ -88,6 +90,7 @@ class _CameraState extends State<Camera> {
       ],
     );
   }
+
   String timestamp() => DateTime.now().millisecondsSinceEpoch.toString();
   Future<String> takePicture() async {
     final Directory extDir = await getApplicationDocumentsDirectory();
@@ -108,15 +111,18 @@ class _CameraState extends State<Camera> {
     }
     return filePath;
   }
+
   void logError(String code, String message) =>
-    print('Error: $code\nError Message: $message');
+      print('Error: $code\nError Message: $message');
   void _showCameraException(CameraException e) {
     logError(e.code, e.description);
     showInSnackBar('Error: ${e.code}\n${e.description}');
   }
+
   void showInSnackBar(String message) {
     _scaffoldKey.currentState.showSnackBar(SnackBar(content: Text(message)));
   }
+
   void onTakePictureButtonPressed() {
     takePicture().then((String filePath) {
       if (mounted) {
@@ -134,13 +140,14 @@ class _CameraState extends State<Camera> {
       child: Align(
         alignment: Alignment.centerRight,
         child: SizedBox(
-                child: Image.file(File('newimg.jpg')),
-                width: 64.0,
-                height: 64.0,
-              ),
+          child: Image.file(File('newimg.jpg')),
+          width: 64.0,
+          height: 64.0,
+        ),
       ),
     );
   }
+
   Widget _cameraPreviewWidget() {
     if (controller == null || !controller.value.isInitialized) {
       return const Text(
@@ -164,36 +171,49 @@ class _CameraState extends State<Camera> {
     final length = await _image.length();
     final request = new http.MultipartRequest('GET', Uri.parse(apiUrl))
       ..files.add(new http.MultipartFile('image', _image.openRead(), length));
-    http.Response response = await http.Response.fromStream(await request.send());
+    http.Response response =
+        await http.Response.fromStream(await request.send());
     print("Result: ${response.body}");
     //return JSON.decode(response.body);
   }
-  latestUploadFunction(File imageFile){
+
+  latestUploadFunction(File imageFile) async {
     print("SO FAR SO GOOD");
-    String base64image = base64Encode(imageFile.readAsBytesSync());
-    print("CONVERTED TO BASE 64");
-    String filename = imageFile.path.split("/").last;
-    print("FILENAME IS");
-    print(filename);
+    var stream =
+        new http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
+    var length = await imageFile.length();
     String url = Auth.api_address + "/lectures/api/lecture-image/";
-    http.post(url, body: {
-      "image":base64image,
-      "lecture":"15",
-    }).then((response){
-      print(response.statusCode);
-    }).catchError((error){
-      print(error);
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    var multipartFile = new http.MultipartFile('image', stream, length,
+        filename: basename(imageFile.path));
+    request.fields["lecture"]="11";
+    request.files.add(multipartFile);
+    var response = await request.send();
+    print(response.statusCode);
+    response.stream.transform(utf8.decoder).listen((value) {
+      print(value);
     });
-
-
+    /*http.post(url, headers: {
+        //AuthUtils.AUTH_HEADER: _authToken
+        'Content-Type' : 'application/json',
+      }, body: json.encode({
+      "image": base64image,
+      "lecture": "15",
+    })).then((response) {
+      print(response.statusCode);
+    }).catchError((error) {
+      print(error);
+    });*/
   }
-  upload(imageFile) async{
+
+  upload(imageFile) async {
     var stream = http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
     var length = await imageFile.length();
-    var uri = Uri.parse("http://192.168.43.203:8000/lectures/api/lecture-image/");
+    var uri =
+        Uri.parse("http://192.168.43.203:8000/lectures/api/lecture-image/");
     var request = new http.MultipartRequest("POST", uri);
     var multipartFile = new http.MultipartFile('image', stream, length,
-          filename: basename(imageFile.path));
+        filename: basename(imageFile.path));
     request.files.add(multipartFile);
     var response = await request.send();
     print('resposnesent');
@@ -201,6 +221,5 @@ class _CameraState extends State<Camera> {
     response.stream.transform(utf8.decoder).listen((value) {
       print(value);
     });
-
   }
 }
