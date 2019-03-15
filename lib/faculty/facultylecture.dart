@@ -7,6 +7,8 @@ import 'dart:convert';
 import '../objects/allobjects.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class FacultyLectures extends StatefulWidget {
+  final int id;
+  FacultyLectures(this.id);
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
@@ -15,6 +17,7 @@ class FacultyLectures extends StatefulWidget {
 }
 
 class _FacultyLecturesState extends State<FacultyLectures> {
+  
   List<LectureProff> lectures = List();
   List<Widget> allLectures = List<Widget>();
   Widget _getLecturesCard() {
@@ -142,7 +145,7 @@ class _FacultyLecturesState extends State<FacultyLectures> {
   }
 
   Future<String> _getdatafromserver() async {
-    var url = "http://192.168.43.203:8000/accounts/api/teacher/?teacher=10";
+    var url = "http://192.168.43.203:8000/accounts/api/teacher/?teacher="+widget.id.toString();
     var client = http.Client();
     var request = http.Request('GET', Uri.parse(url));
     var outerstring;

@@ -40,7 +40,7 @@ class _CoursePageState extends State<CourcePage> with TickerProviderStateMixin {
 
   _showAtendence(date) {
     return FutureBuilder(
-        future: getdatafromserver(widget._id.toString(), date),
+        future: getdatafromserver('15', date),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             var jsondata = jsonDecode(snapshot.data.toString());
@@ -90,13 +90,12 @@ class _CoursePageState extends State<CourcePage> with TickerProviderStateMixin {
                                       fontWeight: FontWeight.bold)),
                               Switch(
                                 value: _students[i][index][1],
-                                onChanged: (bool value) {
+                                onChanged: (bool _value) {
+                                  print(_value);
                                   setState(() {
-                                    _students[i][index][1] =
-                                        !_students[i][index][1];
-                                    set_att(_students[i][index][2],
-                                        _students[i][index][1]);
+                                    _students[i][index][1] = _value;
                                   });
+                                  set_att(_students[i][index][2], _value);
                                 },
                               )
                             ],
@@ -149,7 +148,7 @@ class _CoursePageState extends State<CourcePage> with TickerProviderStateMixin {
               actions: <Widget>[
                 FlatButton(
                   child: Text("Close"),
-                  onPressed: (){
+                  onPressed: () {
                     Navigator.of(context).pop();
                   },
                 )
@@ -246,17 +245,15 @@ class _CoursePageState extends State<CourcePage> with TickerProviderStateMixin {
 
   Future set_att(id, present) async {
     var url = Auth.api_address + "/lectures/api/sal/" + id.toString() + "/";
-    var client = http.Client();
-    var request = http.Request('PATCH', Uri.parse(url));
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String token = prefs.getString("token");
-    request.headers[HttpHeaders.userAgentHeader] = token;
-    request.body = jsonEncode([
-      {"op": "replace", "path": "/present", "value": true}
-    ]);
-    var response = await client.send(request);
-    var responsestring = await response.stream.bytesToString();
-    print(responsestring);
+    var request = new http.MultipartRequest("PATCH", Uri.parse(url));
+    request.fields["present"] = present.toString();
+    var response = await request.send();
+    print(response.statusCode);
+    response.stream.transform(utf8.decoder).listen((value) {
+      print(value);
+    });
   }
 }
 

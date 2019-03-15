@@ -7,7 +7,8 @@ import 'dart:convert';
 import 'dart:io';
 
 class Auth{
-  static final api_address = "http://10.20.0.34:8000";
+  static final api_address = "http://10.20.0.91:8000";
+  static String id;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignin = new GoogleSignIn();
 
@@ -18,7 +19,7 @@ class Auth{
     return true;
   }
 
-  Future<int> gSignin() async {
+  Future<List<int>> gSignin() async {
     GoogleSignInAccount googleSignInAccount = await _googleSignin.signIn();
     GoogleSignInAuthentication googleSignInAuthentication =
         await googleSignInAccount.authentication;
@@ -48,6 +49,8 @@ class Auth{
     var decodeddata = jsonDecode(responsestr);
     List<int> datalist = List();
     datalist.add(decodeddata["profile_id"]);
+    prefs.setString("id",decodeddata["profile_id"].toString() );
+    id = decodeddata['profile_id'].toString();
     if(decodeddata["is_student"] == true && decodeddata["is_teacher"] == true){
       datalist.add(3);
     }
@@ -61,6 +64,6 @@ class Auth{
     //});
     print("printing what is retuned");
     print(datalist);
-    return datalist[1];
+    return datalist;
   }
 }

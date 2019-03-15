@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 // import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import './student/studenthome.dart';
 import './faculty/facultyhome.dart';
-import './faculty/coursepage.dart';
 import 'camera.dart';
 import 'package:camera/camera.dart';
 
@@ -33,7 +32,7 @@ void main() async{
       _defaulthome = StudentHome(0);
     }
     if(token == '2'){
-      _defaulthome = FacultyHome(0);
+      _defaulthome = FacultyHome(0,1);
     }
   }
   runApp(MyApp(cameras));
@@ -92,10 +91,10 @@ class _MyAppState extends State<MyApp> {
       title: 'Greatest app',
       home: _defaulthome,
       routes: <String, WidgetBuilder>{
-        '/facultyhome' : (BuildContext context) => FacultyHome(0),
+        '/facultyhome' : (BuildContext context) => FacultyHome(0,1),
         '/studenthome' : (BuildContext context) => StudentHome(0),
         '/tastudenthome' : (BuildContext context) => StudentHome(1),
-        '/tahome' : (BuildContext context) => FacultyHome(1),
+        '/tahome' : (BuildContext context) => FacultyHome(1,1),
         '/login' : (BuildContext context) => LoginPage(), 
         '/camera' : (BuildContext context) => Camera(widget.cameras),
         '/profile' : (BuildContext context) => Profile(),

@@ -8,7 +8,8 @@ import './facultyclasses.dart';
 import './facultylecture.dart';
 class FacultyHome extends StatefulWidget {
   int clearance;
-  FacultyHome(this.clearance);
+  final int id;
+  FacultyHome(this.clearance,this.id);
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
@@ -17,12 +18,13 @@ class FacultyHome extends StatefulWidget {
 }
 
 class FacultyHomeState extends State<FacultyHome> with SingleTickerProviderStateMixin {
-  Widget frontlayer = FacultyLectures();
+  Widget frontlayer;
   AnimationController controller;
   Auth auth = Auth();
   @override
   void initState(){
     super.initState();
+    frontlayer = FacultyLectures(widget.id);
     print('init state');
     controller = AnimationController(
       duration: const Duration(milliseconds: 600),
@@ -47,11 +49,11 @@ class FacultyHomeState extends State<FacultyHome> with SingleTickerProviderState
         setState(() {
           if(category=='Lectures'){
             controller.fling(velocity: 2.0);
-            frontlayer=FacultyLectures();
+            frontlayer=FacultyLectures(widget.id);
           }
           if(category=='Courses'){
             controller.fling(velocity: 2.0);
-            frontlayer=FacultyClasses();
+            frontlayer=FacultyClasses(widget.id);
           }
           if(category=='Settings'){
             controller.fling(velocity: 2.0);
