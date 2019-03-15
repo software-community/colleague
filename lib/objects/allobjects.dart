@@ -3,7 +3,10 @@ class Course {
   String course_code;
   String course_name;
   int student_count;
-  Course(this.id, this.course_code, this.course_name, this.student_count);
+  String studentCode;
+  String taCode;
+  Course(this.id, this.course_code, this.course_name, this.student_count,
+      this.studentCode, this.taCode);
 }
 
 class Lecture {
@@ -21,5 +24,4 @@ class LectureProff {
   String time;
   String code;
   LectureProff(this.id, this.course, this.time, this.code);
-  
 }

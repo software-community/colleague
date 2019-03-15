@@ -13,7 +13,9 @@ import 'package:colleague/auth.dart';
 class CourcePage extends StatefulWidget {
   final int _id;
   final String _courseName;
-  CourcePage(this._id, this._courseName);
+  final String studentCode;
+  final String taCode;
+  CourcePage(this._id, this._courseName, this.studentCode, this.taCode);
   @override
   _CoursePageState createState() => _CoursePageState();
 }
@@ -144,7 +146,10 @@ class _CoursePageState extends State<CourcePage> with TickerProviderStateMixin {
           builder: (BuildContext context) {
             return AlertDialog(
               title: Text("Code to join"),
-              content: ListView(),
+              content: Text("Student Code : " +
+                  widget.studentCode +
+                  "\nTA Code : " +
+                  widget.taCode),
               actions: <Widget>[
                 FlatButton(
                   child: Text("Close"),

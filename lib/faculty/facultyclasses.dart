@@ -41,8 +41,13 @@ class _FacultyClassesState extends State<FacultyClasses> {
             print("numcourses found...");
             for (int i = 0; i < numcourses; i++) {
               var entry = jsondata["courses"][i];
-              courses.add(Course(entry["id"], entry["course__code"],
-                  entry["course__name"], entry["student_count"]));
+              courses.add(Course(
+                  entry["id"],
+                  entry["course__code"],
+                  entry["course__name"],
+                  entry["student_count"],
+                  entry['student_code'],
+                  entry['ta_code']));
             }
             for (int i = 0; i < courses.length; i++) {
               allCourses.add(Card(
@@ -53,7 +58,11 @@ class _FacultyClassesState extends State<FacultyClasses> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => CourcePage(
-                              courses[i].id, courses[i].course_name)),
+                                courses[i].id,
+                                courses[i].course_name,
+                                courses[i].studentCode,
+                                courses[i].taCode
+                              )),
                     );
                   },
                   child: Container(
@@ -109,7 +118,9 @@ class _FacultyClassesState extends State<FacultyClasses> {
               children: allCourses,
             );
           } else {
-            return Center(child: Text("No Courses Found!"),);
+            return Center(
+              child: Text("No Courses Found!"),
+            );
           }
         } else if (snapshot.hasError) {
           return Text("${snapshot.error}");
