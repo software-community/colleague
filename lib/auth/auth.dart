@@ -22,7 +22,6 @@ abstract class BaseAuth {
 class Auth implements BaseAuth {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final GoogleSignIn googleSignIn = GoogleSignIn();
-  
 
   @override
   FirebaseAuth getFirebaseAuth() {
@@ -52,25 +51,24 @@ class Auth implements BaseAuth {
       final FirebaseUser currentUser = await _firebaseAuth.currentUser();
       assert(user.uid == currentUser.uid);
 
+      // Fetch user from backend
+
+      var data = {'is_student': isstudent, 'is_teacher': isteacher};
+
+      IdTokenResult _idToken = await currentUser.getIdToken();
+
       var url = DotEnv().env['API_ADDRESS'] + "/accounts/token-login/";
+      print(url);
       var client = http.Client();
       var request = http.Request('POST', Uri.parse(url));
-      request.headers[HttpHeaders.authorizationHeader] =
-          currentUser.getIdToken().toString();
-      if (isstudent)
-        request.bodyFields['is_student'] = '1';
-      else
-        request.bodyFields['is_student'] = '0';
-
-      if (isteacher)
-        request.bodyFields['is_teacher'] = '1';
-      else
-        request.bodyFields['is_teacher'] = '0';
+      request.headers[HttpHeaders.authorizationHeader] = _idToken.token;
+      request.headers['content-type'] = 'application/json';
+      request.body = json.encode(data);
 
       var response = await client.send(request);
       var responsestr = await response.stream.bytesToString();
       var decodeddata = jsonDecode(responsestr);
-      id = decodeddata["profile_id"];
+      id = decodeddata["profile_id"].toString();
       isStudent = decodeddata["is_student"];
       isTeacher = decodeddata["is_teacher"];
       return true;

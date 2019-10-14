@@ -22,13 +22,10 @@ class FacultyHomeState extends State<FacultyHome>
     with SingleTickerProviderStateMixin {
   Widget frontlayer;
   AnimationController controller;
-  BaseAuth auth;
   @override
   void initState() {
     super.initState();
-    auth = AuthProvider.of(context).auth;
-    frontlayer = FacultyLectures(auth.id);
-    print('init state');
+    frontlayer = FacultyLectures();
     controller = AnimationController(
       duration: const Duration(milliseconds: 600),
       value: 1.0,
@@ -48,14 +45,15 @@ class FacultyHomeState extends State<FacultyHome>
 
     return GestureDetector(
         onTap: () {
+          BaseAuth auth = AuthProvider.of(context).auth;
           setState(() {
             if (category == 'Lectures') {
               controller.fling(velocity: 2.0);
-              frontlayer = FacultyLectures(auth.id);
+              frontlayer = FacultyLectures();
             }
             if (category == 'Courses') {
               controller.fling(velocity: 2.0);
-              frontlayer = FacultyClasses(auth.id);
+              frontlayer = FacultyClasses();
             }
             if (category == 'Settings') {
               controller.fling(velocity: 2.0);
@@ -101,6 +99,7 @@ class FacultyHomeState extends State<FacultyHome>
       _buildCategory('About', context),
       _buildCategory('Logout', context),
     ];
+    BaseAuth auth = AuthProvider.of(context).auth;
     if (auth.isStudent) {
       navigationList.add(_buildCategory('Switch to Student', context));
     }
@@ -117,7 +116,6 @@ class FacultyHomeState extends State<FacultyHome>
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return BackdropScaffold(
       controller: controller,
       title: Text('Classes'),

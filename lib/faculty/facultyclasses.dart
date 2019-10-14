@@ -1,3 +1,5 @@
+import 'package:colleague/auth/auth.dart';
+import 'package:colleague/auth/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
@@ -10,8 +12,6 @@ import 'add_cource.dart';
 import 'package:colleague/faculty/coursepage.dart';
 
 class FacultyClasses extends StatefulWidget {
-  final String id;
-  FacultyClasses(this.id);
   @override
   State<StatefulWidget> createState() {
     // TODO: implement createState
@@ -150,9 +150,10 @@ class _FacultyClassesState extends State<FacultyClasses> {
   }
 
   Future<String> getdatafromserver() async {
+    BaseAuth auth = AuthProvider.of(context).auth;
     var url = DotEnv().env['API_ADDRESS'] +
         "/accounts/api/teacher/?teacher=" +
-        widget.id.toString();
+        auth.id;
     var client = http.Client();
     var request = http.Request('GET', Uri.parse(url));
     var outerstring;
