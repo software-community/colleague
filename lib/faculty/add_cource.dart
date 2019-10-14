@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'dart:io';
-import 'package:colleague/auth.dart';
 
 class AddCourse extends StatefulWidget {
   @override
@@ -83,7 +83,7 @@ class _AddCourse extends State<AddCourse> {
       setState(() {
         _pBar = _progressbar();
       });
-      apiRequest(Auth.api_address + "/courses/add-courses/", data);
+      apiRequest(DotEnv().env['API_ADDRESS'] + "/courses/add-courses/", data);
     }
   }
 

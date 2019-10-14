@@ -1,29 +1,32 @@
+import 'package:colleague/auth/auth.dart';
+import 'package:colleague/auth/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:backdrop/backdrop.dart';
 
-import './classes.dart';
-import '../about.dart';
-import '../settings.dart';
+import 'classes.dart';
+import 'package:colleague/about.dart';
+import 'package:colleague/settings.dart';
 import 'profile.dart';
-import '../auth.dart';
+
 class StudentHome extends StatefulWidget {
-  int clearance;
-  StudentHome(this.clearance);
+  final VoidCallback onSignedOut;
+  StudentHome({this.onSignedOut});
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return StudentHomeState();
   }
 }
 
-class StudentHomeState extends State<StudentHome> with SingleTickerProviderStateMixin {
+class StudentHomeState extends State<StudentHome>
+    with SingleTickerProviderStateMixin {
   Widget frontlayer = Classes();
   AnimationController controller;
-  Auth auth = Auth();
+  BaseAuth auth;
+
   @override
-  void initState(){
+  void initState() {
     super.initState();
-    print('init state');
+    auth = AuthProvider.of(context).auth;
     controller = AnimationController(
       duration: const Duration(milliseconds: 600),
       value: 1.0,
@@ -38,42 +41,39 @@ class StudentHomeState extends State<StudentHome> with SingleTickerProviderState
   }
 
   Widget _buildCategory(String category, BuildContext context) {
-    final categoryString =
-        category;
+    final categoryString = category;
     final ThemeData theme = Theme.of(context);
 
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          if(category=='Classes'){
-            controller.fling(velocity: 2.0);
-            frontlayer=Classes();
-          }
-          if(category=='Settings'){
-            controller.fling(velocity: 2.0);
-            frontlayer=Settings();
-          }
-          if(category=='About'){
-            controller.fling(velocity: 2.0);
-            frontlayer=About();
-          }
-          if(category == 'Profile'){
-            controller.fling(velocity: 2.0);
-            frontlayer=Profile();
-          }
-          if(category == 'Switch to TA'){
-            Navigator.of(context).pushReplacementNamed('/tahome');
-          }
-          if(category=='Logout'){
-            auth.gLogout().then((result) {
-              if (result) {
+        onTap: () {
+          setState(() {
+            if (category == 'Classes') {
+              controller.fling(velocity: 2.0);
+              frontlayer = Classes();
+            }
+            if (category == 'Settings') {
+              controller.fling(velocity: 2.0);
+              frontlayer = Settings();
+            }
+            if (category == 'About') {
+              controller.fling(velocity: 2.0);
+              frontlayer = About();
+            }
+            if (category == 'Profile') {
+              controller.fling(velocity: 2.0);
+              frontlayer = Profile();
+            }
+            if (category == 'Switch to TA') {
+              Navigator.of(context).pushReplacementNamed('/tahome');
+            }
+            if (category == 'Logout') {
+              auth.signOut().then((result) {
                 Navigator.of(context).pushReplacementNamed('/login');
-              }
-            });
-          }
-        });
-      },
-      child: Column(
+              });
+            }
+          });
+        },
+        child: Column(
           children: <Widget>[
             SizedBox(height: 16.0),
             Text(
@@ -88,11 +88,10 @@ class StudentHomeState extends State<StudentHome> with SingleTickerProviderState
               color: Colors.red,
             ),
           ],
-        )
-    );
+        ));
   }
 
-  Widget backlayer(){
+  Widget backlayer() {
     var navigationList = <Widget>[
       _buildCategory('Classes', context),
       _buildCategory('Settings', context),
@@ -100,9 +99,9 @@ class StudentHomeState extends State<StudentHome> with SingleTickerProviderState
       _buildCategory('Logout', context),
       _buildCategory('Profile', context)
     ];
-    if(widget.clearance==1){
-      navigationList.add(_buildCategory('Switch to TA', context));
-    }
+    // if (widget.clearance == 1) {
+    //   navigationList.add(_buildCategory('Switch to TA', context));
+    // }
     return Center(
       child: Container(
         padding: EdgeInsets.only(top: 40.0),
@@ -113,6 +112,7 @@ class StudentHomeState extends State<StudentHome> with SingleTickerProviderState
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build

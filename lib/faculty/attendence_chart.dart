@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'dart:async';
-
-import 'package:colleague/auth.dart';
 
 class PercentAttendance {
   String coursename;
@@ -84,7 +83,7 @@ class _AttendenceState extends State<AttendanceChart> {
 
           jsondata.forEach(iter);
 
-          if(data.length>0)
+          if (data.length > 0)
             return Padding(
               padding: EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 15.0),
               child: SizedBox(
@@ -99,7 +98,8 @@ class _AttendenceState extends State<AttendanceChart> {
                 height: 40.0 * _showdata.length,
               ),
             );
-          else return new Center(child: Text('no data received'));
+          else
+            return new Center(child: Text('no data received'));
         }
         return new Center(child: CircularProgressIndicator());
       },
@@ -123,8 +123,7 @@ class _AttendenceState extends State<AttendanceChart> {
                 _value = value;
                 if (value == 'two') {
                   _showdata = data.where((i) => i.attendance < 75).toList();
-                } else if(value == 'one')
-                  _showdata = data.toList();
+                } else if (value == 'one') _showdata = data.toList();
               });
             },
           ),
@@ -133,7 +132,7 @@ class _AttendenceState extends State<AttendanceChart> {
   }
 
   Future<String> getdatafromserver(String courseid) async {
-    var url = Auth.api_address +
+    var url = DotEnv().env['API_ADDRESS'] +
         "/courses/get-total-attendance/?course_id=" +
         courseid;
     var client = http.Client();

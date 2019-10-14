@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
-import 'package:colleague/auth.dart';
 
 class PercentAttendance {
   String coursename;
   double attendance;
   PercentAttendance(this.coursename, this.attendance);
-  void setdata(String newname, double newattendance){
+  void setdata(String newname, double newattendance) {
     this.coursename = newname;
     this.attendance = newattendance;
-  } 
+  }
 }
 
 class AttendanceChart extends StatefulWidget {
@@ -46,8 +46,9 @@ class AttendanceChartState extends State<AttendanceChart> {
     var jsondata = jsonDecode(widget.serverdata);
     jsondata = jsondata[0];
     var allcourses = jsondata["courses"];
-    for (int i = 0; i < allcourses.length; i++){
-      data.add(PercentAttendance(allcourses[i]["code"], allcourses[i]["attendance"]));
+    for (int i = 0; i < allcourses.length; i++) {
+      data.add(PercentAttendance(
+          allcourses[i]["code"], allcourses[i]["attendance"]));
     }
 
     series = [
@@ -56,11 +57,11 @@ class AttendanceChartState extends State<AttendanceChart> {
         domainFn: (PercentAttendance attchart, _) => attchart.coursename,
         measureFn: (PercentAttendance attchart, _) => attchart.attendance,
         colorFn: (PercentAttendance attchart, _) => Color(
-              r: Colors.grey[700].red,
-              g: Colors.grey[700].green,
-              b: Colors.grey[700].blue,
-              a: Colors.grey[700].alpha,
-            ),
+          r: Colors.grey[700].red,
+          g: Colors.grey[700].green,
+          b: Colors.grey[700].blue,
+          a: Colors.grey[700].alpha,
+        ),
         data: data,
       ),
     ];
@@ -85,7 +86,7 @@ class AttendanceChartState extends State<AttendanceChart> {
   }
 
   Future<Null> getdatafromserver() async {
-    var url = Auth.api_address+"/accounts/api/student/?student=9";
+    var url = DotEnv().env['API_ADDRESS'] + "/accounts/api/student/?student=9";
     var client = http.Client();
     var request = http.Request('GET', Uri.parse(url));
     var outerstring;
@@ -94,13 +95,15 @@ class AttendanceChartState extends State<AttendanceChart> {
     var response = await client.send(request);
     var responsestring = await response.stream.bytesToString();
     print("PRINTING RESPONSE STRING");
-    jsondata = jsonDecode(responsestring.substring(1, responsestring.length-1));
+    jsondata =
+        jsonDecode(responsestring.substring(1, responsestring.length - 1));
     print("jsondata of student");
     print(jsondata["student"]);
     setState(() {
       int numcourses = jsondata["courses"].length;
-      for(int i=0; i<numcourses; i++){
-        data[i] = PercentAttendance(jsondata["courses"][i]["id"].toString(), jsondata["courses"][i]["attendace"]*100);
+      for (int i = 0; i < numcourses; i++) {
+        data[i] = PercentAttendance(jsondata["courses"][i]["id"].toString(),
+            jsondata["courses"][i]["attendace"] * 100);
         print(data);
       }
     });

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:colleague/auth.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 import '../objects/allobjects.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 class FacultyLectures extends StatefulWidget {
-  final int id;
+  final String id;
   FacultyLectures(this.id);
   @override
   State<StatefulWidget> createState() {
@@ -17,14 +18,20 @@ class FacultyLectures extends StatefulWidget {
 }
 
 class _FacultyLecturesState extends State<FacultyLectures> {
-  
   List<LectureProff> lectures = List();
   List<Widget> allLectures = List<Widget>();
   Widget _getLecturesCard() {
     final width = MediaQuery.of(context).size.width;
     List type = ['Lab', 'Lecture', 'Lab', 'Lecture', "Lab", "Lecture"];
     List numS = ['67', '43', '23', '54', '34', '56'];
-    List time = ['10:45 AM', '10:45 AM', '10:45 AM', '10:45 AM', '10:45 AM', '10:45 AM'];
+    List time = [
+      '10:45 AM',
+      '10:45 AM',
+      '10:45 AM',
+      '10:45 AM',
+      '10:45 AM',
+      '10:45 AM'
+    ];
     return new FutureBuilder(
       future: _getdatafromserver(),
       builder: (context, snapshot) {
@@ -131,7 +138,10 @@ class _FacultyLecturesState extends State<FacultyLectures> {
   }
 
   Future<String> _deleteLecture(int lectureID) async {
-    var url = Auth.api_address+"/lectures/api/lecture/"+lectureID.toString()+"/";
+    var url = DotEnv().env['API_ADDRESS'] +
+        "/lectures/api/lecture/" +
+        lectureID.toString() +
+        "/";
     var client = http.Client();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String token = prefs.getString("token");
@@ -141,11 +151,11 @@ class _FacultyLecturesState extends State<FacultyLectures> {
     var responsestring = await response.stream.bytesToString();
     print("DELETE RESPONSE");
     print(responsestring);
-    
   }
 
   Future<String> _getdatafromserver() async {
-    var url = "http://192.168.43.203:8000/accounts/api/teacher/?teacher="+widget.id.toString();
+    var url = "http://192.168.43.203:8000/accounts/api/teacher/?teacher=" +
+        widget.id.toString();
     var client = http.Client();
     var request = http.Request('GET', Uri.parse(url));
     var outerstring;

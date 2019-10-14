@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
 
 import '../objects/allobjects.dart';
-import 'package:colleague/auth.dart';
 import 'add_cource.dart';
 import 'package:colleague/faculty/coursepage.dart';
 
 class FacultyClasses extends StatefulWidget {
-  final int id;
+  final String id;
   FacultyClasses(this.id);
   @override
   State<StatefulWidget> createState() {
@@ -58,11 +58,10 @@ class _FacultyClassesState extends State<FacultyClasses> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => CourcePage(
-                                courses[i].id,
-                                courses[i].course_name,
-                                courses[i].studentCode,
-                                courses[i].taCode
-                              )),
+                              courses[i].id,
+                              courses[i].course_name,
+                              courses[i].studentCode,
+                              courses[i].taCode)),
                     );
                   },
                   child: Container(
@@ -151,7 +150,7 @@ class _FacultyClassesState extends State<FacultyClasses> {
   }
 
   Future<String> getdatafromserver() async {
-    var url = Auth.api_address +
+    var url = DotEnv().env['API_ADDRESS'] +
         "/accounts/api/teacher/?teacher=" +
         widget.id.toString();
     var client = http.Client();

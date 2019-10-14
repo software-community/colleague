@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
@@ -8,7 +9,6 @@ import 'dart:async';
 
 import 'floating_bar.dart';
 import 'page2.dart';
-import 'package:colleague/auth.dart';
 
 class CourcePage extends StatefulWidget {
   final int _id;
@@ -232,7 +232,7 @@ class _CoursePageState extends State<CourcePage> with TickerProviderStateMixin {
 
   Future<String> getdatafromserver(String courseid, DateTime date) async {
     final _formatter = new DateFormat('yyyy-MM-dd');
-    var url = Auth.api_address +
+    var url = DotEnv().env['API_ADDRESS'] +
         "/courses/get-attendance/?course_id=" +
         courseid +
         "&date=" +
@@ -249,7 +249,10 @@ class _CoursePageState extends State<CourcePage> with TickerProviderStateMixin {
   }
 
   Future set_att(id, present) async {
-    var url = Auth.api_address + "/lectures/api/sal/" + id.toString() + "/";
+    var url = DotEnv().env['API_ADDRESS'] +
+        "/lectures/api/sal/" +
+        id.toString() +
+        "/";
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String token = prefs.getString("token");
     var request = new http.MultipartRequest("PATCH", Uri.parse(url));

@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:io';
 import 'dart:async';
-import 'auth.dart';
-import 'package:quiver/time.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart';
 import 'package:async/async.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Camera extends StatefulWidget {
   List<CameraDescription> cameras;
@@ -182,7 +180,7 @@ class _CameraState extends State<Camera> {
     var stream =
         new http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
     var length = await imageFile.length();
-    String url = Auth.api_address + "/lectures/api/lecture-image/";
+    String url = DotEnv().env['API_ADDRESS'] + "/lectures/api/lecture-image/";
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     var multipartFile = new http.MultipartFile('image', stream, length,
         filename: basename(imageFile.path));

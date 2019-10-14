@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flip_panel/flip_panel.dart';
 import 'package:flutter_circular_chart/flutter_circular_chart.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:io';
@@ -9,7 +10,7 @@ import 'dart:convert';
 import './attendancechart.dart';
 import './absentlecture.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../auth.dart';
+
 class Classes extends StatefulWidget {
   final GlobalKey<AnimatedCircularChartState> _chartKey =
       new GlobalKey<AnimatedCircularChartState>();
@@ -220,42 +221,42 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
         itemsCount: 1000000000,
         period: const Duration(milliseconds: 1600),
         itemBuilder: (context, index) => Container(
-              margin: EdgeInsets.symmetric(horizontal: 0.0),
-              width: width / 2 - 20,
-              height: 70.0,
-              child: Column(
-                //crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(4.0),
-                        topRight: Radius.circular(4.0),
-                      ),
-                      color: Colors.blue,
-                    ),
-                    height: 35.0,
-                    width: width / 2 - 20,
-                    child: Align(
-                      alignment: FractionalOffset.bottomCenter,
-                      child: Text(
-                        courses[index % courses.length],
-                      ),
-                    ),
+          margin: EdgeInsets.symmetric(horizontal: 0.0),
+          width: width / 2 - 20,
+          height: 70.0,
+          child: Column(
+            //crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(4.0),
+                    topRight: Radius.circular(4.0),
                   ),
-                  Container(
-                    height: 33.0,
-                    width: 150.0,
-                    child: Align(
-                      alignment: FractionalOffset.topCenter,
-                      child: Text(
-                        timings[index % courses.length],
-                      ),
-                    ),
+                  color: Colors.blue,
+                ),
+                height: 35.0,
+                width: width / 2 - 20,
+                child: Align(
+                  alignment: FractionalOffset.bottomCenter,
+                  child: Text(
+                    courses[index % courses.length],
                   ),
-                ],
+                ),
               ),
-            ),
+              Container(
+                height: 33.0,
+                width: 150.0,
+                child: Align(
+                  alignment: FractionalOffset.topCenter,
+                  child: Text(
+                    timings[index % courses.length],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -357,31 +358,31 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
     );
   }
 
-  Widget _getAddCourseResponse(String enrollCode){
+  Widget _getAddCourseResponse(String enrollCode) {
     return FutureBuilder(
       future: _makeCourseAddRequest(enrollCode),
-      builder: (context, snapshot){
-        if(snapshot.hasData){
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
           var jsondata = jsonDecode(snapshot.data.toString());
-          if(jsondata["status"] == "Success"){
+          if (jsondata["status"] == "Success") {
             return Text("Course Added Successfully");
           }
-        }else if(snapshot.hasError){
+        } else if (snapshot.hasError) {
           return Text("${snapshot.error}");
         }
         return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            CircularProgressIndicator(
-              strokeWidth: 7.0,
-            ),
-            Text("  Loading..."),
-          ]);
+          CircularProgressIndicator(
+            strokeWidth: 7.0,
+          ),
+          Text("  Loading..."),
+        ]);
       },
     );
   }
 
-  Future<String> _makeCourseAddRequest(String enrollCode) async{
+  Future<String> _makeCourseAddRequest(String enrollCode) async {
     print("entered api request");
-    String url = Auth.api_address + "/courses/register-course/";
+    String url = DotEnv().env['API_ADDRESS'] + "/courses/register-course/";
     var client = new http.Client();
     var request = new http.Request('POST', Uri.parse(url));
     //Map<String, dynamic> body = jsonDecode(jsonData);
@@ -389,7 +390,7 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
     String token = prefs.getString("token");
     print(token);
     request.headers[HttpHeaders.AUTHORIZATION] = token;
-    request.body = jsonEncode({"code":enrollCode}).toString();
+    request.body = jsonEncode({"code": enrollCode}).toString();
     var future = client
         .send(request)
         .then((response) => response.stream
@@ -441,7 +442,7 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
   }
 
   Future<String> getdatafromserver() async {
-    var url = Auth.api_address+"/accounts/api/student/?student=9";
+    var url = DotEnv().env['API_ADDRESS'] + "/accounts/api/student/?student=9";
     var client = http.Client();
     var request = http.Request('GET', Uri.parse(url));
     var outerstring;
