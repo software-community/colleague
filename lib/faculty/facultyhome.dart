@@ -13,7 +13,6 @@ class FacultyHome extends StatefulWidget {
   FacultyHome({this.onSignedOut});
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return FacultyHomeState();
   }
 }
@@ -67,9 +66,7 @@ class FacultyHomeState extends State<FacultyHome>
               Navigator.of(context).pushReplacementNamed('/tastudenthome');
             }
             if (category == 'Logout') {
-              auth.signOut().then((result) {
-                  Navigator.of(context).pushReplacementNamed('/login');
-              });
+              widget.onSignedOut();
             }
           });
         },

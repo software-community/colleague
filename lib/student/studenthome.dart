@@ -1,12 +1,10 @@
-import 'package:colleague/auth/auth.dart';
-import 'package:colleague/auth/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:backdrop/backdrop.dart';
 
-import 'classes.dart';
+import 'package:colleague/student/classes.dart';
 import 'package:colleague/about.dart';
 import 'package:colleague/settings.dart';
-import 'profile.dart';
+import 'package:colleague/student/profile.dart';
 
 class StudentHome extends StatefulWidget {
   final VoidCallback onSignedOut;
@@ -21,12 +19,10 @@ class StudentHomeState extends State<StudentHome>
     with SingleTickerProviderStateMixin {
   Widget frontlayer = Classes();
   AnimationController controller;
-  BaseAuth auth;
 
   @override
   void initState() {
     super.initState();
-    auth = AuthProvider.of(context).auth;
     controller = AnimationController(
       duration: const Duration(milliseconds: 600),
       value: 1.0,
@@ -67,9 +63,7 @@ class StudentHomeState extends State<StudentHome>
               Navigator.of(context).pushReplacementNamed('/tahome');
             }
             if (category == 'Logout') {
-              auth.signOut().then((result) {
-                Navigator.of(context).pushReplacementNamed('/login');
-              });
+              widget.onSignedOut();
             }
           });
         },
@@ -115,7 +109,6 @@ class StudentHomeState extends State<StudentHome>
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return BackdropScaffold(
       controller: controller,
       title: Text('Classes'),
