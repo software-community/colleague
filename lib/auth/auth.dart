@@ -6,6 +6,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 abstract class BaseAuth {
   FirebaseAuth getFirebaseAuth();
   Future<bool> gSignIn(bool isstudent, bool isteacher);
@@ -13,6 +15,8 @@ abstract class BaseAuth {
   Future<FirebaseUser> currentUser();
   Future<IdTokenResult> currentUserToken();
   Future<void> signOut();
+  setLoginPrefs();
+  loadLoginPrefs();
   bool isStudent = false;
   bool isTeacher = false;
   bool isTA = false;
@@ -22,6 +26,10 @@ abstract class BaseAuth {
 class Auth implements BaseAuth {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final GoogleSignIn googleSignIn = GoogleSignIn();
+
+  Auth(){
+    loadLoginPrefs();
+  }
 
   @override
   FirebaseAuth getFirebaseAuth() {
@@ -71,6 +79,7 @@ class Auth implements BaseAuth {
       id = decodeddata["profile_id"].toString();
       isStudent = decodeddata["is_student"];
       isTeacher = decodeddata["is_teacher"];
+      setLoginPrefs();
       return true;
     } catch (err) {
       print(err);
@@ -98,7 +107,30 @@ class Auth implements BaseAuth {
 
   @override
   Future<void> signOut() async {
+    id = null;
+    isStudent = false;
+    isTeacher = false;
+    isTA = false;
+    setLoginPrefs();
     return _firebaseAuth.signOut();
+  }
+
+  @override
+  setLoginPrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('PROFILE_ID', id);
+    prefs.setBool('IS_STUDENT', isStudent);
+    prefs.setBool('IS_TEACHER', isTeacher);
+    prefs.setBool('IS_TA', isTA);
+  }
+
+  @override
+  loadLoginPrefs() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    id = prefs.getString('PROFILE_ID') ?? null;
+    isStudent = prefs.getBool('IS_STUDENT') ?? false;
+    isTeacher = prefs.getBool('IS_TEACHER') ?? false;
+    isTA = prefs.getBool('IS_TA') ?? false;
   }
 
   @override
