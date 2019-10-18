@@ -44,7 +44,6 @@ class FacultyHomeState extends State<FacultyHome>
 
     return GestureDetector(
         onTap: () {
-          BaseAuth auth = AuthProvider.of(context).auth;
           setState(() {
             if (category == 'Lectures') {
               controller.fling(velocity: 2.0);

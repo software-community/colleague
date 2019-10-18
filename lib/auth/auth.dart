@@ -27,7 +27,7 @@ class Auth implements BaseAuth {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
-  Auth(){
+  Auth() {
     loadLoginPrefs();
   }
 
@@ -74,13 +74,20 @@ class Auth implements BaseAuth {
       request.body = json.encode(data);
 
       var response = await client.send(request);
-      var responsestr = await response.stream.bytesToString();
-      var decodeddata = jsonDecode(responsestr);
-      id = decodeddata["profile_id"].toString();
-      isStudent = decodeddata["is_student"];
-      isTeacher = decodeddata["is_teacher"];
-      setLoginPrefs();
-      return true;
+      if (response.statusCode == 200) {
+        var responsestr = await response.stream.bytesToString();
+        print(responsestr);
+        var decodeddata = jsonDecode(responsestr);
+        if (decodeddata['status'] == 'ok') {
+          isStudent = decodeddata["is_student"];
+          isTeacher = decodeddata["is_teacher"];
+          id = decodeddata["_id"].toString();
+          setLoginPrefs();
+          return true;
+        } else
+          return false;
+      } else
+        return false;
     } catch (err) {
       print(err);
       return false;

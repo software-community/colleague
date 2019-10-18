@@ -253,8 +253,7 @@ class _CoursePageState extends State<CourcePage> with TickerProviderStateMixin {
         "/lectures/api/sal/" +
         id.toString() +
         "/";
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String token = prefs.getString("token");
+
     var request = new http.MultipartRequest("PATCH", Uri.parse(url));
     request.fields["present"] = present.toString();
     var response = await request.send();

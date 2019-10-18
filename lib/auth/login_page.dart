@@ -57,6 +57,8 @@ class _LoginPageState extends State<LoginPage> {
                 child: Text('Google-Signin'),
                 onPressed: () async {
                   final BaseAuth auth = AuthProvider.of(context).auth;
+                  auth.isStudent = isStudent;
+                  auth.isTeacher = isTeacher;
                   bool result = await auth.gSignIn(isStudent, isTeacher);
                   if (result) {
                     widget.onSignedIn();

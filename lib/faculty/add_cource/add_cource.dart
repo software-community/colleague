@@ -1,9 +1,13 @@
+import 'package:colleague/auth/auth.dart';
+import 'package:colleague/auth/auth_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'dart:io';
+
+import 'add_course_dialogue.dart';
 
 class AddCourse extends StatefulWidget {
   @override
@@ -76,28 +80,23 @@ class _AddCourse extends State<AddCourse> {
   _postdata() {
     _formKey.currentState.save();
     if (_courseCode != "" && _courseName != "") {
-      print("before datatosubmit");
       Map<String, dynamic> data = _listtoMap();
-      print("DATA TO SUBMIT");
       print(data);
       setState(() {
         _pBar = _progressbar();
       });
-      apiRequest(DotEnv().env['API_ADDRESS'] + "/courses/add-courses/", data);
+      _apiRequest(DotEnv().env['API_ADDRESS'] + "/courses/add-courses/", data);
     }
   }
 
-  Future<void> apiRequest(String url, Map<String, dynamic> jsonData) async {
-    print("entered api request");
+  _apiRequest(String url, Map<String, dynamic> jsonData) async {
     var client = new http.Client();
     var request = new http.Request('POST', Uri.parse(url));
-    //Map<String, dynamic> body = jsonDecode(jsonData);
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String token = prefs.getString("token");
-    //print(token);
-    request.headers[HttpHeaders.AUTHORIZATION] = token;
+    BaseAuth auth = AuthProvider.of(context).auth;
+    IdTokenResult idTokenResult = await auth.currentUserToken();
+    request.headers[HttpHeaders.acceptHeader] = idTokenResult.token;
     request.body = jsonEncode(jsonData).toString();
-    var future = client
+    client
         .send(request)
         .then((response) => response.stream
             .bytesToString()
@@ -110,7 +109,6 @@ class _AddCourse extends State<AddCourse> {
 
   @override
   void initState() {
-    // TODO: implement initState
     lts = _maptoList();
     _courseCode = "";
     _courseName = "";
@@ -276,118 +274,6 @@ class FormCard extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class MyDialogContent extends StatefulWidget {
-  final ValueChanged<List<String>> onAdd;
-  MyDialogContent({this.onAdd});
-  @override
-  _MyDialogContentState createState() => new _MyDialogContentState();
-}
-
-class _MyDialogContentState extends State<MyDialogContent> {
-  @override
-  void initState() {
-    startTime = TimeOfDay(hour: 9, minute: 0);
-    endTime = TimeOfDay(hour: 9, minute: 50);
-    super.initState();
-  }
-
-  Future<void> _selectTime(BuildContext context, int time) async {
-    if (time == 0) {
-      final TimeOfDay picked =
-          await showTimePicker(context: context, initialTime: startTime);
-      if (picked != null && picked != startTime)
-        setState(() {
-          startTime = picked;
-        });
-    } else {
-      final TimeOfDay picked =
-          await showTimePicker(context: context, initialTime: endTime);
-      if (picked != null && picked != endTime)
-        setState(() {
-          endTime = picked;
-        });
-    }
-  }
-
-  var startTime;
-  var endTime;
-
-  _getContent() {
-    return Container(
-        height: 100.0,
-        child: ListView(
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Text("Start Time : "),
-                RaisedButton(
-                  onPressed: () {
-                    setState(() {
-                      _selectTime(context, 0);
-                    });
-                  },
-                  child: Text(startTime.format(context)),
-                )
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Text("End Time : "),
-                RaisedButton(
-                  onPressed: () {
-                    _selectTime(context, 1);
-                  },
-                  child: Text(endTime.format(context)),
-                )
-              ],
-            ),
-          ],
-        ));
-  }
-
-  String format(BuildContext context, TimeOfDay t) {
-    assert(debugCheckHasMediaQuery(context));
-    assert(debugCheckHasMaterialLocalizations(context));
-    final MaterialLocalizations localizations =
-        MaterialLocalizations.of(context);
-    return localizations.formatTimeOfDay(
-      t,
-      alwaysUse24HourFormat: true,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: new Text("Create Lecture"),
-      content: _getContent(),
-      actions: <Widget>[
-        // usually buttons at the bottom of the dialog
-        new FlatButton(
-          child: new Text("Close"),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-        RaisedButton(
-          shape: new RoundedRectangleBorder(
-              borderRadius: new BorderRadius.circular(100.0)),
-          textColor: Colors.white,
-          color: Colors.blue,
-          onPressed: () {
-            widget
-                .onAdd([format(context, startTime), format(context, endTime)]);
-            Navigator.of(context).pop();
-          },
-          child: Text("ADD"),
-        ),
-      ],
     );
   }
 }

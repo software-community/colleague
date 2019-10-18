@@ -1,5 +1,6 @@
 import 'package:colleague/auth/auth.dart';
 import 'package:colleague/auth/auth_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
@@ -12,41 +13,31 @@ import 'package:shared_preferences/shared_preferences.dart';
 class FacultyLectures extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return _FacultyLecturesState();
   }
 }
 
 class _FacultyLecturesState extends State<FacultyLectures> {
+  var _body;
   List<LectureProff> lectures = List();
   List<Widget> allLectures = List<Widget>();
   Widget _getLecturesCard() {
-    final width = MediaQuery.of(context).size.width;
     List type = ['Lab', 'Lecture', 'Lab', 'Lecture', "Lab", "Lecture"];
     List numS = ['67', '43', '23', '54', '34', '56'];
-    List time = [
-      '10:45 AM',
-      '10:45 AM',
-      '10:45 AM',
-      '10:45 AM',
-      '10:45 AM',
-      '10:45 AM'
-    ];
     return new FutureBuilder(
       future: _getdatafromserver(),
       builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          lectures.clear();
-          var jsondata = jsonDecode(snapshot.data.toString());
-          jsondata = jsondata[0];
-          print(jsondata);
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasData) {
+          if(snapshot.data.length == 0)
+            return Center(child: Text('No Lecture Today!'),);
+          var jsondata = snapshot.data[0];
           int numlectures = jsondata["lecture_pending"].length;
           for (int i = 0; i < numlectures; i++) {
             var lect = jsondata["lecture_pending"][i];
-            print("ABOUT TO ADD LECTURE");
             lectures.add(LectureProff(
                 lect["id"], lect["course"], lect["time"], lect["code"]));
-            print("CREATED LECTURE");
             allLectures.add(Card(
               elevation: 10.0,
               child: InkWell(
@@ -130,7 +121,15 @@ class _FacultyLecturesState extends State<FacultyLectures> {
             children: allLectures,
           );
         } else if (snapshot.hasError) {
-          return Text("${snapshot.error}");
+          return Center(
+              child: RaisedButton(
+            child: Icon(Icons.replay),
+            onPressed: () {
+              setState(() {
+                _body = _getLecturesCard();
+              });
+            },
+          ));
         }
         return Center(child: CircularProgressIndicator());
       },
@@ -153,28 +152,19 @@ class _FacultyLecturesState extends State<FacultyLectures> {
     print(responsestring);
   }
 
-  Future<String> _getdatafromserver() async {
-    BaseAuth auth = AuthProvider.of(context).auth;
-    var url = "http://192.168.43.203:8000/accounts/api/teacher/?teacher=" +
-        auth.id;
-    var client = http.Client();
-    var request = http.Request('GET', Uri.parse(url));
-    var outerstring;
-    var jsondata;
-    request.headers[HttpHeaders.AUTHORIZATION] = '1';
-    var response = await client.send(request);
-    var responsestring = await response.stream.bytesToString();
-    return responsestring;
+  @override
+  void didChangeDependencies() {
+    _body = _getLecturesCard();
+    super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Material(
       shape: BeveledRectangleBorder(
           borderRadius: BorderRadius.only(topLeft: Radius.circular(20.0))),
       child: Scaffold(
-        body: _getLecturesCard(),
+        body: _body,
         floatingActionButton: FloatingActionButton.extended(
             icon: Icon(Icons.camera),
             label: Text('Snap'),
@@ -184,5 +174,19 @@ class _FacultyLecturesState extends State<FacultyLectures> {
             }),
       ),
     );
+  }
+
+  Future<dynamic> _getdatafromserver() async {
+    final BaseAuth auth = AuthProvider.of(context).auth;
+    var url = DotEnv().env['API_ADDRESS'] +
+        "/accounts/api/teacher/?teacher=" +
+        auth.id;
+    IdTokenResult idtoken = await auth.currentUserToken();
+    var response = await http
+        .get(url, headers: {HttpHeaders.authorizationHeader: idtoken.token});
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else
+      throw Exception('Error in getting');
   }
 }
