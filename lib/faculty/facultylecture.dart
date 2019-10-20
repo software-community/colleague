@@ -19,25 +19,31 @@ class FacultyLectures extends StatefulWidget {
 
 class _FacultyLecturesState extends State<FacultyLectures> {
   var _body;
-  List<LectureProff> lectures = List();
-  List<Widget> allLectures = List<Widget>();
+
   Widget _getLecturesCard() {
-    List type = ['Lab', 'Lecture', 'Lab', 'Lecture', "Lab", "Lecture"];
-    List numS = ['67', '43', '23', '54', '34', '56'];
     return new FutureBuilder(
       future: _getdatafromserver(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasData) {
-          if(snapshot.data.length == 0)
-            return Center(child: Text('No Lecture Today!'),);
-          var jsondata = snapshot.data[0];
-          int numlectures = jsondata["lecture_pending"].length;
+          var jsondata;
+          try {
+            jsondata = snapshot.data[0]['lecture_pending'];
+            if (jsondata.length == 0) throw Exception('No Lecture!');
+          } catch (err) {
+            return Center(
+              child: Text("No Lecture Today!"),
+            );
+          }
+          List<LectureProff> lectures = List();
+          List<Widget> allLectures = List<Widget>();
+
+          int numlectures = jsondata.length;
           for (int i = 0; i < numlectures; i++) {
-            var lect = jsondata["lecture_pending"][i];
+            var lect = jsondata[i];
             lectures.add(LectureProff(
-                lect["id"], lect["course"], lect["time"], lect["code"]));
+                lect["id"], lect["course"], lect["time"], lect["code"], lect['type']));
             allLectures.add(Card(
               elevation: 10.0,
               child: InkWell(
@@ -57,7 +63,7 @@ class _FacultyLecturesState extends State<FacultyLectures> {
                               },
                             ),
                             FlatButton(
-                              child: Text("Yes Cancel"),
+                              child: Text("Cancel"),
                               onPressed: () {
                                 _deleteLecture(lectures[i].id);
                                 Navigator.of(context).pop();
@@ -83,7 +89,7 @@ class _FacultyLecturesState extends State<FacultyLectures> {
                             ),
                           ),
                           Text(
-                            type[i],
+                            lectures[i].type.toUpperCase(),
                             textAlign: TextAlign.right,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
@@ -97,17 +103,6 @@ class _FacultyLecturesState extends State<FacultyLectures> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
                             Text(lectures[i].time.substring(0, 5)),
-                            Container(
-                              child: Row(children: <Widget>[
-                                Text(numS[i]),
-                                Align(
-                                  alignment: Alignment(-3.0, -4.0),
-                                  child: Icon(
-                                    Icons.face,
-                                  ),
-                                ),
-                              ]),
-                            ),
                           ],
                         ),
                       )
@@ -136,7 +131,7 @@ class _FacultyLecturesState extends State<FacultyLectures> {
     );
   }
 
-  Future<String> _deleteLecture(int lectureID) async {
+  _deleteLecture(int lectureID) async {
     var url = DotEnv().env['API_ADDRESS'] +
         "/lectures/api/lecture/" +
         lectureID.toString() +
@@ -178,9 +173,8 @@ class _FacultyLecturesState extends State<FacultyLectures> {
 
   Future<dynamic> _getdatafromserver() async {
     final BaseAuth auth = AuthProvider.of(context).auth;
-    var url = DotEnv().env['API_ADDRESS'] +
-        "/accounts/api/teacher/?teacher=" +
-        auth.id;
+    var url =
+        DotEnv().env['API_ADDRESS'] + "/accounts/api/teacher/?id=" + auth.id;
     IdTokenResult idtoken = await auth.currentUserToken();
     var response = await http
         .get(url, headers: {HttpHeaders.authorizationHeader: idtoken.token});

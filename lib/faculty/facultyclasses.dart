@@ -22,7 +22,7 @@ class FacultyClasses extends StatefulWidget {
 class _FacultyClassesState extends State<FacultyClasses> {
   // global objects
   var _body;
-  List<Course> courses = List();
+
   Widget _getClassesCardFuture() {
     return new FutureBuilder(
       future: _getdatafromserver(),
@@ -31,22 +31,24 @@ class _FacultyClassesState extends State<FacultyClasses> {
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasData) {
           List<Widget> allCourses = List<Widget>();
-          var jsondata = snapshot.data;
-          if (jsondata.length == 0 || jsondata[0].length == 0)
+          var jsondata;
+          try {
+            jsondata = snapshot.data[0]['courses'];
+            if (jsondata.length == 0) throw Exception('No Course!');
+          } catch (err) {
             return Center(
               child: Text("No Courses Found!"),
             );
-
-          jsondata = jsondata[0];
-          int numcourses = jsondata["courses"].length;
-          print("numcourses found...");
+          }
+          List<Course> courses = List();
+          int numcourses = jsondata.length;
           for (int i = 0; i < numcourses; i++) {
-            var entry = jsondata["courses"][i];
+            var entry = jsondata[i];
             courses.add(Course(
                 entry["id"],
                 entry["course__code"],
                 entry["course__name"],
-                entry["student_count"],
+                entry["students_count"],
                 entry['student_code'],
                 entry['ta_code']));
           }
@@ -160,9 +162,8 @@ class _FacultyClassesState extends State<FacultyClasses> {
 
   Future<dynamic> _getdatafromserver() async {
     final BaseAuth auth = AuthProvider.of(context).auth;
-    var url = DotEnv().env['API_ADDRESS'] +
-        "/accounts/api/teacher/?teacher=" +
-        auth.id;
+    var url =
+        DotEnv().env['API_ADDRESS'] + "/accounts/api/teacher/?id=" + auth.id;
     IdTokenResult idtoken = await auth.currentUserToken();
     var response = await http
         .get(url, headers: {HttpHeaders.authorizationHeader: idtoken.token});

@@ -23,5 +23,6 @@ class LectureProff {
   int course;
   String time;
   String code;
-  LectureProff(this.id, this.course, this.time, this.code);
+  String type;
+  LectureProff(this.id, this.course, this.time, this.code, this.type);
 }

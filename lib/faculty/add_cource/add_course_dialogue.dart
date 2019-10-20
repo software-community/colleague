@@ -35,41 +35,67 @@ class _MyDialogContentState extends State<MyDialogContent> {
 
   var startTime;
   var endTime;
+  var type = 'lecture';
 
   _getContent() {
-    return Container(
-        height: 100.0,
-        width: 100.0,
-        child: ListView(
+    return Wrap(
+      children: <Widget>[
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Text("Start Time : "),
-                RaisedButton(
-                  onPressed: () {
-                    setState(() {
-                      _selectTime(context, 0);
-                    });
-                  },
-                  child: Text(startTime.format(context)),
-                )
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                Text("End Time : "),
-                RaisedButton(
-                  onPressed: () {
-                    _selectTime(context, 1);
-                  },
-                  child: Text(endTime.format(context)),
-                )
-              ],
-            ),
+            Text("Start Time : "),
+            RaisedButton(
+              onPressed: () {
+                setState(() {
+                  _selectTime(context, 0);
+                });
+              },
+              child: Text(startTime.format(context)),
+            )
           ],
-        ));
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            Text("End Time : "),
+            RaisedButton(
+              onPressed: () {
+                _selectTime(context, 1);
+              },
+              child: Text(endTime.format(context)),
+            )
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            Text("Type : "),
+            DropdownButton<String>(
+              value: type,
+              items: <DropdownMenuItem<String>>[
+                DropdownMenuItem(
+                  child: Text('Lecture'),
+                  value: 'lecture',
+                ),
+                DropdownMenuItem(
+                  child: Text('Lab'),
+                  value: 'lab',
+                ),
+                DropdownMenuItem(
+                  child: Text('Tutorial'),
+                  value: 'tutorial',
+                ),
+              ],
+              onChanged: (_value) {
+                setState(() {
+                  type = _value;
+                });
+              },
+            )
+          ],
+        ),
+      ],
+    );
   }
 
   String format(BuildContext context, TimeOfDay t) {
@@ -102,8 +128,8 @@ class _MyDialogContentState extends State<MyDialogContent> {
           textColor: Colors.white,
           color: Colors.blue,
           onPressed: () {
-            widget
-                .onAdd([format(context, startTime), format(context, endTime)]);
+            widget.onAdd(
+                [format(context, startTime), format(context, endTime), type]);
             Navigator.of(context).pop();
           },
           child: Text("ADD"),
