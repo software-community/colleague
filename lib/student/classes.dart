@@ -1,3 +1,7 @@
+import 'package:colleague/auth/auth.dart';
+import 'package:colleague/auth/auth_provider.dart';
+import 'package:colleague/student/add_course_student.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flip_panel/flip_panel.dart';
 import 'package:flutter_circular_chart/flutter_circular_chart.dart';
@@ -9,14 +13,12 @@ import '../objects/allobjects.dart';
 import 'dart:convert';
 import './attendancechart.dart';
 import './absentlecture.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Classes extends StatefulWidget {
   final GlobalKey<AnimatedCircularChartState> _chartKey =
       new GlobalKey<AnimatedCircularChartState>();
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return _ClassesState();
   }
 }
@@ -27,11 +29,11 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
   Animation<double> animation;
   var attendance;
   initState() {
-    super.initState();
     controller = AnimationController(
         duration: const Duration(milliseconds: 500), vsync: this);
     animation = CurvedAnimation(parent: controller, curve: Curves.easeIn);
     controller.forward();
+    super.initState();
   }
 
   dispose() {
@@ -139,7 +141,7 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
       margin: EdgeInsets.only(top: 4.0),
       child: Row(
         children: <Widget>[
-          _buildAction(data),
+          _buildAction(),
           _buildAllClasses(data),
         ],
       ),
@@ -202,10 +204,10 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
   Widget _buildAllClasses(String data) {
     var jsondata = jsonDecode(data);
     jsondata = jsondata[0];
-    var pending_lectures = jsondata["lecture_pending"];
+    var pendingLectures = jsondata["lecture_pending"];
     final courses = [];
-    for (int i = 0; i < pending_lectures.length; i++) {
-      courses.add(pending_lectures[i]["code"]);
+    for (int i = 0; i < pendingLectures.length; i++) {
+      courses.add(pendingLectures[i]["code"]);
     }
     final timings = ['11:45 AM', '02:00 PM', '02:55 PM', '03:50 PM'];
     if (courses.length == 0) {
@@ -262,7 +264,7 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
   }
 
   // this function builds and returns a single instance of the class card, it is used for showing the next class
-  Widget _buildAction(String data) {
+  Widget _buildAction() {
     return Padding(
         padding: EdgeInsets.symmetric(horizontal: 6.0),
         child: Card(
@@ -308,148 +310,86 @@ class _ClassesState extends State<Classes> with TickerProviderStateMixin {
   }
 
   void _showAddCourseDialog(BuildContext context) {
-    final enrollController = TextEditingController();
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Add a Course'),
-          content: Column(mainAxisSize: MainAxisSize.min, children: [
-            Text('Enter the student enrollment code below to join a course'),
-            Padding(padding: EdgeInsets.only(top: 20.0)),
-            TextFormField(
-              controller: enrollController,
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'XueVc',
-                  labelText: 'Enrollment Code'),
-            ),
-          ]),
-          actions: <Widget>[
-            FlatButton(
-              child: Text("Cancel"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            FlatButton(
-              child: Text("Add Course"),
-              onPressed: () {
-                Navigator.of(context).pop();
-                _addCourseEnroll(enrollController.text);
-              },
-            ),
-          ],
+        return AddCourseContent();
+      },
+    );
+  }
+
+  var _body;
+
+  _buildbody() {
+    return FutureBuilder(
+      future: getdatafromserver(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting)
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        else if (snapshot.hasData) {
+          return ListView(
+            children: <Widget>[
+              _getProgressCard(context, snapshot.data.toString()),
+              _getClassesCard(context, snapshot.data.toString()),
+              AttendanceChart(snapshot.data.toString()),
+            ],
+          );
+        } else if (snapshot.hasError) {
+          return Center(
+              child: RaisedButton(
+            child: Icon(Icons.replay),
+            onPressed: () {
+              setState(() {
+                _body = _buildbody();
+              });
+            },
+          ));
+        }
+        return Center(
+          child: CircularProgressIndicator(),
         );
       },
     );
   }
 
-  void _addCourseEnroll(String enrollCode) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      child: Dialog(
-        child: Padding(
-          padding: EdgeInsets.all(5.0),
-          child: _getAddCourseResponse(enrollCode),
-        ),
-      ),
-    );
-  }
-
-  Widget _getAddCourseResponse(String enrollCode) {
-    return FutureBuilder(
-      future: _makeCourseAddRequest(enrollCode),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          var jsondata = jsonDecode(snapshot.data.toString());
-          if (jsondata["status"] == "Success") {
-            return Text("Course Added Successfully");
-          }
-        } else if (snapshot.hasError) {
-          return Text("${snapshot.error}");
-        }
-        return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          CircularProgressIndicator(
-            strokeWidth: 7.0,
-          ),
-          Text("  Loading..."),
-        ]);
-      },
-    );
-  }
-
-  Future<String> _makeCourseAddRequest(String enrollCode) async {
-    print("entered api request");
-    String url = DotEnv().env['API_ADDRESS'] + "/courses/register-course/";
-    var client = new http.Client();
-    var request = new http.Request('POST', Uri.parse(url));
-    //Map<String, dynamic> body = jsonDecode(jsonData);
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String token = prefs.getString("token");
-    print(token);
-    request.headers[HttpHeaders.AUTHORIZATION] = token;
-    request.body = jsonEncode({"code": enrollCode}).toString();
-    var future = client
-        .send(request)
-        .then((response) => response.stream
-            .bytesToString()
-            .then((value) => print(value.toString())))
-        .catchError((error) => print(error.toString()))
-        .whenComplete(() {
-      Navigator.of(context).pop();
-    });
+  @override
+  void didChangeDependencies() {
+    _body = _buildbody();
+    super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
     // widget for the top card which shows the progress bar and the Alerts
-    return new FutureBuilder(
-      future: getdatafromserver(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          print(snapshot.data.toString());
-          return Material(
-            shape: BeveledRectangleBorder(
-                borderRadius:
-                    BorderRadius.only(topLeft: Radius.circular(20.0))),
-            child: Scaffold(
-              floatingActionButton: FloatingActionButton(
-                child: Icon(Icons.add_box),
-                elevation: 20.0,
-                onPressed: () {
-                  _showAddCourseDialog(context);
-                },
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(16.0))),
-              ),
-              body: ListView(
-                children: <Widget>[
-                  _getProgressCard(context, snapshot.data.toString()),
-                  _getClassesCard(context, snapshot.data.toString()),
-                  AttendanceChart(snapshot.data.toString()),
-                ],
-              ),
-            ),
-          );
-        } else if (snapshot.hasError) {
-          return Text("${snapshot.error}");
-        }
-        return new CircularProgressIndicator();
-      },
+    return Material(
+      shape: BeveledRectangleBorder(
+          borderRadius: BorderRadius.only(topLeft: Radius.circular(20.0))),
+      child: Scaffold(
+          floatingActionButton: FloatingActionButton(
+            child: Icon(Icons.add_box),
+            elevation: 20.0,
+            onPressed: () {
+              _showAddCourseDialog(context);
+            },
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(16.0))),
+          ),
+          body: _body),
     );
   }
 
   Future<String> getdatafromserver() async {
-    var url = DotEnv().env['API_ADDRESS'] + "/accounts/api/student/?student=9";
-    var client = http.Client();
-    var request = http.Request('GET', Uri.parse(url));
-    var outerstring;
-    var jsondata;
-    request.headers[HttpHeaders.AUTHORIZATION] = '1';
-    var response = await client.send(request);
-    var responsestring = await response.stream.bytesToString();
-    return responsestring;
+    final BaseAuth auth = AuthProvider.of(context).auth;
+    var url =
+        DotEnv().env['API_ADDRESS'] + "/accounts/api/student/?id=" + auth.id;
+    IdTokenResult idtoken = await auth.currentUserToken();
+    var response = await http
+        .get(url, headers: {HttpHeaders.authorizationHeader: idtoken.token});
+    if (response.statusCode == 200) {
+      return response.body;
+    } else
+      throw Exception('Error in getting');
   }
 }

@@ -35,6 +35,7 @@ dependencies:
   flutter_circular_chart: ^0.1.0
   backdrop: any
   flutter_dotenv: ^2.0.3
+  fluttertoast: ^3.1.3
 
 dev_dependencies:
   flutter_test:
