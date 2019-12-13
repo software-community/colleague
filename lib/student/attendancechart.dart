@@ -21,7 +21,6 @@ class AttendanceChart extends StatefulWidget {
   AttendanceChart(this.serverdata);
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return AttendanceChartState();
   }
 }
@@ -35,14 +34,12 @@ class AttendanceChartState extends State<AttendanceChart> {
   var toreturn;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     // api call to get the attendance in each course
-    // TODO: implement build
     var jsondata = jsonDecode(widget.serverdata);
     jsondata = jsondata[0];
     var allcourses = jsondata["courses"];

@@ -78,7 +78,6 @@ class AbsentLecture extends AnimatedWidget {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    // TODO: implement build
     Animation<double> animation = listenable;
     return Center(
       child: Opacity(

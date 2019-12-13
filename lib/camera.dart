@@ -14,7 +14,6 @@ class Camera extends StatefulWidget {
   Camera(this.cameras);
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return _CameraState();
   }
 }
@@ -25,7 +24,6 @@ class _CameraState extends State<Camera> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     controller = CameraController(widget.cameras[0], ResolutionPreset.high);
     controller.initialize().then((_) {
@@ -38,7 +36,6 @@ class _CameraState extends State<Camera> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     controller?.dispose();
     super.dispose();
   }

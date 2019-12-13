@@ -7,7 +7,6 @@ class ShowImages extends StatefulWidget {
   ShowImages(this.missedLecture);
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return ShowImagesState();
   }
 }
@@ -15,7 +14,6 @@ class ShowImages extends StatefulWidget {
 class ShowImagesState extends State<ShowImages> {
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
       body: Padding(
         padding: EdgeInsets.all(20.0),
@@ -98,7 +96,6 @@ class FullScreenImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     double width = MediaQuery.of(context).size.height;
     return Scaffold(
       body: ListView(children: [

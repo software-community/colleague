@@ -48,7 +48,6 @@ class _AttendenceState extends State<AttendanceChart> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
 
     var series = [
       Series(
